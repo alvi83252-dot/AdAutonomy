@@ -7,6 +7,7 @@ import { Loader2 } from 'lucide-react';
 type PayPalButtons = {
   render: (container: HTMLElement) => Promise<void>;
   close: () => void;
+  isEligible?: () => boolean;
 };
 
 type PayPalSDK = {
@@ -59,15 +60,13 @@ function loadPayPalSdk(clientId: string, currency: string): Promise<void> {
   if (typeof window === 'undefined') return Promise.resolve();
   if (window.paypal) return Promise.resolve();
 
-  const url = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${currency}&intent=capture&components=buttons&enable-funding=paypal`;
+  const url = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${currency}&intent=capture&components=buttons&disable-funding=card,credit,paylater`;
 
   return new Promise((resolve, reject) => {
     const existing = document.getElementById('paypal-sdk') as HTMLScriptElement | null;
 
     if (existing) {
-      waitForPayPal()
-        .then(resolve)
-        .catch(reject);
+      waitForPayPal().then(resolve).catch(reject);
       return;
     }
 
@@ -75,6 +74,7 @@ function loadPayPalSdk(clientId: string, currency: string): Promise<void> {
     script.id = 'paypal-sdk';
     script.src = url;
     script.async = true;
+    script.setAttribute('data-sdk-integration-source', 'integrationbuilder_ac');
     script.onload = () => {
       waitForPayPal().then(resolve).catch(reject);
     };
@@ -143,11 +143,14 @@ export function PayPalCheckout({
             } catch (err) {
               const message = (err as Error).message;
               setError(message);
-              setProcessing(false);
               throw err;
+            } finally {
+              setProcessing(false);
             }
           },
           onApprove: async (data) => {
+            setProcessing(true);
+            setError(null);
             try {
               const res = await fetch('/api/payment', {
                 method: 'POST',
@@ -155,6 +158,7 @@ export function PayPalCheckout({
                 body: JSON.stringify({
                   action: 'approve',
                   paymentId: data.orderID,
+                  amount: safeAmount,
                   allowMock: false,
                 }),
               });
@@ -181,9 +185,15 @@ export function PayPalCheckout({
           },
           onCancel: () => {
             setProcessing(false);
-            setError('Payment cancelled.');
+            setError(null);
           },
         });
+
+        if (buttons.isEligible && !buttons.isEligible()) {
+          setError('PayPal is not available in this browser. Try Chrome and allow popups.');
+          setLoading(false);
+          return;
+        }
 
         buttonsRef.current = buttons;
         if (!cancelled) setLoading(false);
@@ -220,14 +230,14 @@ export function PayPalCheckout({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 isolate">
       {label && <p className="text-sm text-muted-foreground">{label}</p>}
       <p className="text-lg font-semibold">
         ${safeAmount.toFixed(2)}{' '}
         <span className="text-sm font-normal text-muted-foreground">{currency}</span>
       </p>
 
-      <div className="relative min-h-[45px] max-w-md">
+      <div className="relative min-h-[55px] w-full pointer-events-auto">
         {loading && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -240,13 +250,13 @@ export function PayPalCheckout({
             Processing payment…
           </div>
         )}
-        <div ref={containerRef} className="min-h-[45px]" />
+        <div ref={containerRef} className="min-h-[55px] w-full" />
       </div>
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 
       <p className="text-xs text-muted-foreground">
-        Log in at the PayPal popup with a <strong>sandbox Personal (buyer)</strong> account from your{' '}
+        Log in with a <strong>sandbox Personal (buyer)</strong> account from{' '}
         <a
           href="https://developer.paypal.com/dashboard/accounts"
           target="_blank"
@@ -255,7 +265,7 @@ export function PayPalCheckout({
         >
           PayPal Sandbox Accounts
         </a>
-        . Allow popups for localhost. Your business sandbox receives the payment.
+        . Allow popups for localhost.
       </p>
     </div>
   );

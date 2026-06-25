@@ -93,7 +93,7 @@ export async function approvePayment(
 
       if (res.ok) {
         return {
-          id: paymentId,
+          id: `capture-${paymentId}`,
           type: 'checkout',
           amount: parseFloat(data.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value || '0'),
           currency: data.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.currency_code || 'USD',
@@ -118,7 +118,7 @@ export async function approvePayment(
 
   return {
     ...mockPayment('checkout', fallbackAmount, 'USD'),
-    id: paymentId,
+    id: `capture-${paymentId}`,
     status: 'completed',
   };
 }
