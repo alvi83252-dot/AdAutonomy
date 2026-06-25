@@ -3,15 +3,19 @@ import { createCheckout, approvePayment, refundPayment } from '@/lib/agents/paym
 
 export async function POST(req: NextRequest) {
   try {
-    const { action, amount, paymentId } = await req.json();
+    const body = await req.json();
+    const { action, amount, paymentId, currency, allowMock } = body;
 
     switch (action) {
       case 'checkout': {
-        const payment = await createCheckout(amount || 100);
+        const payment = await createCheckout(amount || 100, currency || 'USD');
         return NextResponse.json({ payment });
       }
       case 'approve': {
-        const payment = await approvePayment(paymentId);
+        const payment = await approvePayment(paymentId, {
+          allowMock: allowMock !== false,
+          fallbackAmount: amount || 100,
+        });
         return NextResponse.json({ payment });
       }
       case 'refund': {

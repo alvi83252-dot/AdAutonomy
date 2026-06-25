@@ -17,6 +17,7 @@ export type AgentName =
   | 'PaymentAgent'
   | 'DeploymentAgent'
   | 'VideoAgent'
+  | 'DragonflyAgent'
   | 'Orchestrator';
 
 export type AgentMessage = {
@@ -60,6 +61,13 @@ export type SimulationResult = {
   cpc: number;
   roas: number;
   projectedRevenue: number;
+  compute?: {
+    provider: 'modal' | 'local';
+    runs: number;
+    latencyMs: number;
+    requestId?: string;
+    fallbackReason?: string;
+  };
 };
 
 export type SafetyFlag = {
@@ -85,6 +93,79 @@ export type PaymentRecord = {
   timestamp: string;
 };
 
+export type SeapointBookkeepingEntry = {
+  id: string;
+  paymentId: string;
+  description: string;
+  category: string;
+  direction: 'inflow' | 'outflow';
+  amount: number;
+  currency: string;
+  confidence: number;
+  status: 'categorised' | 'review';
+};
+
+export type SeapointInvoice = {
+  id: string;
+  paymentId: string;
+  supplier: string;
+  description: string;
+  amount: number;
+  currency: string;
+  dueDate: string;
+  status: 'approved' | 'needs_approval' | 'paid';
+  approvalReason: string;
+};
+
+export type SeapointFinanceSnapshot = {
+  provider: 'seapoint-bridge' | 'local';
+  generatedAt: string;
+  currency: string;
+  openingCash: number;
+  currentCash: number;
+  projectedRevenue: number;
+  campaignSpend: number;
+  netCashFlow: number;
+  monthlyBurn: number;
+  runwayMonths: number;
+  approvalThreshold: number;
+  pendingApprovals: number;
+  bookkeeping: SeapointBookkeepingEntry[];
+  invoices: SeapointInvoice[];
+  sync: {
+    status: 'synced' | 'local' | 'failed';
+    requestId?: string;
+    message: string;
+  };
+};
+
+export type ManusPlanStep = {
+  stepId: string;
+  agent: AgentName;
+  objective: string;
+  validation: string;
+  priority: 'high' | 'medium' | 'low';
+};
+
+export type ManusStructuredPlan = {
+  summary: string;
+  executionStrategy: string;
+  riskCheckpoints: string[];
+  steps: ManusPlanStep[];
+};
+
+export type ManusOrchestration = ManusStructuredPlan & {
+  provider: 'manus' | 'local';
+  status: 'completed' | 'fallback';
+  taskId?: string;
+  taskUrl?: string;
+  requestId?: string;
+  createdAt: string;
+  latencyMs: number;
+  toolsObserved: string[];
+  fallbackReason?: string;
+};
+
 export type InvestorSummary = {
   totalSpend: number;
   projectedROI: number;
@@ -92,6 +173,25 @@ export type InvestorSummary = {
   riskScore: number;
   recommendation: string;
   highlights: string[];
+};
+
+export type DragonflyBreakdown = {
+  creativeQuality: number;
+  audienceDiversity: number;
+  simulationConsistency: number;
+  safetyCompliance: number;
+  pipelineEfficiency: number;
+  agentConfidence: number;
+  paymentIntegrity: number;
+};
+
+export type DragonflyScore = {
+  overall: number;
+  technicalExcellence: number;
+  autonomy: number;
+  breakdown: DragonflyBreakdown;
+  detail: string;
+  timestamp: string;
 };
 
 export type CampaignState = {
@@ -104,7 +204,10 @@ export type CampaignState = {
   safetyFlags: SafetyFlag[];
   feedback: FeedbackItem[];
   payments: PaymentRecord[];
+  finance?: SeapointFinanceSnapshot;
+  orchestration?: ManusOrchestration;
   investorSummary?: InvestorSummary;
+  autonomyScore?: DragonflyScore;
   approvals: ApprovalVote[];
   status: 'pending' | 'running' | 'review' | 'approved' | 'deployed' | 'failed';
   currentStep: number;

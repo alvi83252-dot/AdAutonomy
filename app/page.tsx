@@ -185,9 +185,11 @@ export default function HomePage() {
         <AnimatedCard delay={0.3} className="text-center">
           <h3 className="text-2xl font-bold text-success mb-4">Campaign Deployed Successfully</h3>
           <div className="flex flex-wrap justify-center gap-3">
+            <Link href="/orchestration"><Button variant="outline">View Orchestration</Button></Link>
             <Link href="/videos"><Button variant="glow">Create Ad Video</Button></Link>
             <Link href="/creative"><Button variant="outline">View Creatives</Button></Link>
             <Link href="/simulation"><Button variant="outline">View Simulation</Button></Link>
+            <Link href="/finance"><Button variant="outline">Financial Control</Button></Link>
             <Link href="/deploy"><Button variant="outline">Export Pack</Button></Link>
           </div>
         </AnimatedCard>

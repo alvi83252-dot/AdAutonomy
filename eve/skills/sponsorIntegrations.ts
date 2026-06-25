@@ -1,17 +1,27 @@
+import type { DragonflyScore } from '@/lib/types';
+
 export const sponsorIntegrations = {
   cursor: { name: 'Cursor', role: 'Autonomous coding engine', enabled: true },
   openai: { name: 'OpenAI', role: 'Creative + reasoning', enabled: true },
   supabase: { name: 'Supabase', role: 'Local database', enabled: true },
   modal: { name: 'Modal', role: 'Serverless compute simulation', enabled: process.env.MODAL_SIMULATION_ENABLED === 'true' },
-  seapoint: { name: 'Seapoint', role: 'Automation + workflows', enabled: process.env.SEAPOINT_WORKFLOW_ENABLED === 'true' },
+  seapoint: { name: 'Seapoint', role: 'Cash flow, bookkeeping + finance controls', enabled: process.env.SEAPOINT_WORKFLOW_ENABLED === 'true' },
   manus: { name: 'Manus AI', role: 'Multi-agent orchestration', enabled: process.env.MANUS_ORCHESTRATION_ENABLED === 'true' },
   elyos: { name: 'Elyos AI', role: 'Safety + compliance', enabled: process.env.ELYOS_SAFETY_ENABLED === 'true' },
   wassist: { name: 'Wassist', role: 'Customer feedback simulation', enabled: process.env.WASSIST_FEEDBACK_ENABLED === 'true' },
   seedcamp: { name: 'Seedcamp', role: 'Investor analysis', enabled: process.env.SEEDCAMP_INVESTOR_ENABLED === 'true' },
   bluewire: { name: 'Blue Wire Capital', role: 'Financial modeling', enabled: process.env.BLUEWIRE_FINANCE_ENABLED === 'true' },
   io: { name: 'IO', role: 'Deployment + ops simulation', enabled: process.env.IO_DEPLOYMENT_ENABLED === 'true' },
-  dragonfly: { name: 'Dragonfly', role: 'Technical excellence scoring', enabled: process.env.DRAGONFLY_SCORING_ENABLED === 'true' },
+  dragonfly: {
+    name: 'Dragonfly',
+    role: 'Technical excellence scoring',
+    enabled: process.env.DRAGONFLY_SCORING_ENABLED === 'true',
+    module: '@/lib/sponsors/dragonflyScoring',
+    website: 'https://dragonfly.xyz',
+  },
   downingStreet: { name: '10 Downing Street', role: 'Ethical AI + compliance', enabled: true },
   codewall: { name: 'CodeWall', role: 'Developer tooling', enabled: true },
   paypal: { name: 'PayPal Sandbox', role: 'Simulated payments', enabled: true },
 };
+
+export type { DragonflyScore };

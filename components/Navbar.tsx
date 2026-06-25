@@ -10,10 +10,13 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 
 const navItems = [
   { href: '/', label: 'Home' },
+  { href: '/orchestration', label: 'Orchestration' },
   { href: '/brief', label: 'Brief' },
   { href: '/creative', label: 'Creative' },
   { href: '/videos', label: 'Videos' },
   { href: '/simulation', label: 'Simulation' },
+  { href: '/finance', label: 'Finance' },
+  { href: '/investor', label: 'Investor' },
   { href: '/deploy', label: 'Deploy' },
 ];
 

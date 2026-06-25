@@ -28,7 +28,17 @@ export default function SimulationPage() {
         ];
         return (
           <>
-            <p className="text-muted-foreground -mt-4 mb-4">Forecasted by SimulationAgent — Data Analyst</p>
+            <div className="flex flex-wrap items-center gap-2 -mt-4 mb-4 text-sm text-muted-foreground">
+              <span>Forecasted by SimulationAgent — Data Analyst</span>
+              {sim.compute && (
+                <span className="rounded-full border border-border/70 bg-card/60 px-2.5 py-1">
+                  {sim.compute.provider === 'modal' ? 'Modal serverless' : 'Local fallback'}
+                  {' · '}
+                  {sim.compute.runs.toLocaleString()} runs
+                  {sim.compute.provider === 'modal' ? ` · ${sim.compute.latencyMs}ms` : ''}
+                </span>
+              )}
+            </div>
             <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {metrics.map((m, i) => (
                 <motion.div

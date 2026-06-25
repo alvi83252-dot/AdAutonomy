@@ -7,6 +7,7 @@ export const connections = {
   supabase: {
     type: 'database',
     url: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    projectId: process.env.SUPABASE_PROJECT_ID,
   },
   openai: {
     type: 'llm',
