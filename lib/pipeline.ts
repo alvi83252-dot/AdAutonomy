@@ -10,6 +10,7 @@ export const PIPELINE_STEPS: PipelineStep[] = [
   { id: 'payment', label: 'Payment Processing', agent: 'PaymentAgent', path: '/investor', status: 'pending' },
   { id: 'investor', label: 'Investor Summary', agent: 'InvestorAgent', path: '/investor', status: 'pending' },
   { id: 'deploy', label: 'Deployment & Export', agent: 'DeploymentAgent', path: '/deploy', status: 'pending' },
+  { id: 'dragonfly', label: 'Dragonfly Scoring', agent: 'DragonflyAgent', path: '/deploy', status: 'pending' },
 ];
 
 export function getStepStatus(currentStep: number, status: string): PipelineStep[] {

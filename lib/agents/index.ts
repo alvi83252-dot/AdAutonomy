@@ -7,6 +7,7 @@ export { runFeedbackAgent } from './feedbackAgent';
 export { runPaymentAgent } from './paymentAgent';
 export { runInvestorAgent } from './investorAgent';
 export { runDeploymentAgent } from './deploymentAgent';
+export { runDragonflyAgent } from './dragonflyAgent';
 export { runVideoAgent } from './videoAgent';
 export { sendMessage, receiveMessages, requestApproval, sendApproval, escalate } from './messaging';
 export { checkConsensus, addApproval, withRetry } from './consensus';
