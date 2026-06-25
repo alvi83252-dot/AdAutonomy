@@ -23,17 +23,17 @@ export function AgentLoader({ size = 'md', label, className }: AgentLoaderProps)
     <div className={cn('flex flex-col items-center gap-3', className)}>
       <div className="relative">
         <motion.div
-          className={cn(s.outer, 'rounded-full border-2 border-indigo-500/20')}
+          className={cn(s.outer, 'rounded-full border-2 border-primary/20')}
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
         />
         <motion.div
-          className={cn('absolute inset-1 rounded-full border-2 border-t-purple-500 border-r-transparent border-b-transparent border-l-transparent')}
+          className={cn('absolute inset-1 rounded-full border-2 border-t-primary border-r-transparent border-b-transparent border-l-transparent')}
           animate={{ rotate: -360 }}
           transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
         />
         <div className="absolute inset-0 flex items-center justify-center">
-          <Bot className={cn(s.icon, 'text-indigo-400')} />
+          <Bot className={cn(s.icon, 'text-primary')} />
         </div>
       </div>
       {label && (

@@ -39,7 +39,7 @@ export function NavigationProgress() {
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-indigo-500/50"
+            className="h-full bg-primary shadow-lg shadow-primary/50"
             initial={{ width: '0%' }}
             animate={{ width: `${progress}%` }}
             transition={{ ease: 'easeOut' }}

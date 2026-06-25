@@ -18,8 +18,8 @@ export function AnimatedCard({ children, className, delay = 0, hover = true }: A
       transition={{ duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
       whileHover={hover ? { scale: 1.02, y: -4 } : undefined}
       className={cn(
-        'rounded-xl border border-border/50 bg-card/50 backdrop-blur-xl p-6 shadow-xl',
-        'transition-shadow duration-300 hover:shadow-indigo-500/10 hover:border-indigo-500/20',
+        'rounded-xl border border-border/50 bg-card p-6 shadow-xl',
+        'transition-shadow duration-300 hover:shadow-primary/10 hover:border-primary/20',
         className
       )}
     >

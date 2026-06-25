@@ -25,22 +25,22 @@ export default function InvestorPage() {
 
             {summary && (
               <AnimatedCard>
-                <h2 className="text-lg font-semibold text-indigo-400 mb-4">Financial Overview</h2>
+                <h2 className="text-lg font-semibold text-primary mb-4">Financial Overview</h2>
                 <div className="grid md:grid-cols-4 gap-4 mb-6">
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <p className="text-2xl font-bold">${summary.totalSpend.toLocaleString()}</p>
+                    <p className="text-2xl font-bold tabular-nums">${summary.totalSpend.toLocaleString()}</p>
                     <p className="text-xs text-muted-foreground">Total Spend</p>
                   </div>
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <p className="text-2xl font-bold text-green-400">{summary.projectedROI}x</p>
+                    <p className="text-2xl font-bold tabular-nums text-green-400">{summary.projectedROI}x</p>
                     <p className="text-xs text-muted-foreground">Projected ROI</p>
                   </div>
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <p className="text-2xl font-bold">{summary.breakEvenDays}d</p>
+                    <p className="text-2xl font-bold tabular-nums">{summary.breakEvenDays}d</p>
                     <p className="text-xs text-muted-foreground">Break Even</p>
                   </div>
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <p className="text-2xl font-bold">{(summary.riskScore * 100).toFixed(0)}%</p>
+                    <p className="text-2xl font-bold tabular-nums">{(summary.riskScore * 100).toFixed(0)}%</p>
                     <p className="text-xs text-muted-foreground">Risk Score</p>
                   </div>
                 </div>
@@ -53,7 +53,7 @@ export default function InvestorPage() {
 
             {payments.length > 0 && (
               <AnimatedCard>
-                <h2 className="text-lg font-semibold text-purple-400 mb-4">PaymentAgent Transactions</h2>
+                <h2 className="text-lg font-semibold text-primary mb-4">PaymentAgent Transactions</h2>
                 <div className="space-y-2">
                   {payments.map((p) => (
                     <div key={p.id} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg text-sm">
@@ -62,7 +62,7 @@ export default function InvestorPage() {
                         <span className="text-muted-foreground ml-2">{p.id.slice(0, 16)}...</span>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold">${p.amount.toFixed(2)} {p.currency}</p>
+                        <p className="font-bold tabular-nums">${p.amount.toFixed(2)} {p.currency}</p>
                         <p className="text-xs text-muted-foreground capitalize">{p.status}</p>
                       </div>
                     </div>

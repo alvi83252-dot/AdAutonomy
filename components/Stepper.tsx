@@ -22,9 +22,9 @@ export function Stepper({ steps, currentStep }: StepperProps) {
   return (
     <div className="w-full">
       <div className="flex items-center justify-between relative">
-        <div className="absolute top-5 left-0 right-0 h-0.5 bg-white/10" />
+        <div className="absolute top-5 left-0 right-0 h-0.5 bg-border" />
         <motion.div
-          className="absolute top-5 left-0 h-0.5 bg-gradient-to-r from-indigo-500 to-purple-500"
+          className="absolute top-5 left-0 h-0.5 bg-primary"
           initial={{ width: '0%' }}
           animate={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
           transition={{ duration: 0.8, ease: 'easeInOut' }}
@@ -46,10 +46,10 @@ export function Stepper({ steps, currentStep }: StepperProps) {
               <div
                 className={cn(
                   'w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300',
-                  isComplete && 'bg-indigo-500 border-indigo-500 text-white',
-                  isActive && 'border-purple-500 bg-purple-500/20 text-purple-400',
+                  isComplete && 'bg-primary border-primary text-primary-foreground',
+                  isActive && 'border-primary bg-primary/20 text-primary',
                   step.status === 'error' && 'border-red-500 bg-red-500/20 text-red-400',
-                  step.status === 'pending' && 'border-white/20 bg-background text-muted-foreground'
+                  step.status === 'pending' && 'border-border bg-background text-muted-foreground'
                 )}
               >
                 <Icon className={cn('w-5 h-5', isActive && step.status === 'active' && 'animate-spin')} />
@@ -57,7 +57,7 @@ export function Stepper({ steps, currentStep }: StepperProps) {
               <span
                 className={cn(
                   'mt-2 text-xs text-center max-w-[80px]',
-                  isActive ? 'text-purple-400 font-medium' : 'text-muted-foreground'
+                  isActive ? 'text-primary font-medium' : 'text-muted-foreground'
                 )}
               >
                 {step.label}

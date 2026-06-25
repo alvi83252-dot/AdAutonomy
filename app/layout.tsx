@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -7,17 +7,23 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AppShell } from '@/components/AppShell';
 import { PersonalAssistant } from '@/components/PersonalAssistant';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-sans' });
 
 export const metadata: Metadata = {
   title: 'AdAutonomy — Autonomous Advertising Platform',
   description: 'Self-running advertising company powered by AI agents',
 };
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen parallax-bg transition-colors duration-500`}>
+    <html lang="en" suppressHydrationWarning className={inter.variable}>
+      <body className="font-sans antialiased min-h-screen parallax-bg transition-colors duration-500">
         <ThemeProvider>
           <ErrorBoundary>
             <Navbar />

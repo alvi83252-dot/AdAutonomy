@@ -80,35 +80,40 @@ export default function HomePage() {
         transition={{ duration: 0.8 }}
         className="text-center space-y-6 py-12"
       >
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
-          <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+        <h1 className="text-5xl md:text-8xl font-black tracking-tight text-balance">
+          <span className="text-primary">
             AdAutonomy
           </span>
         </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto text-pretty">
           A self-running advertising company powered entirely by AI agents.
           Hands off. Fully autonomous.
         </p>
       </motion.section>
 
-      <div className="grid md:grid-cols-5 gap-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="grid grid-cols-1 md:grid-cols-5 gap-px overflow-hidden rounded-xl border border-border/50 bg-border/60 shadow-xl"
+      >
         {[
           { icon: Bot, title: '10 AI Agents', desc: 'Autonomous team' },
           { icon: Video, title: 'Ad Videos', desc: 'AI-generated commercials' },
           { icon: Shield, title: 'Safety First', desc: 'Compliance built-in' },
           { icon: TrendingUp, title: 'Live Simulation', desc: 'Performance forecasting' },
           { icon: Rocket, title: 'One Click', desc: 'Full campaign deploy' },
-        ].map((item, i) => (
-          <AnimatedCard key={item.title} delay={i * 0.1} className="text-center">
-            <item.icon className="w-8 h-8 mx-auto mb-3 text-indigo-400" />
-            <h3 className="font-semibold">{item.title}</h3>
-            <p className="text-sm text-muted-foreground mt-1">{item.desc}</p>
-          </AnimatedCard>
+        ].map((item) => (
+          <div key={item.title} className="flex flex-col items-center gap-2 p-5 text-center bg-card">
+            <item.icon className="w-7 h-7 text-primary" />
+            <h3 className="font-semibold text-sm">{item.title}</h3>
+            <p className="text-xs text-muted-foreground">{item.desc}</p>
+          </div>
         ))}
-      </div>
+      </motion.div>
 
       <AnimatedCard delay={0.3}>
-        <h2 className="text-2xl font-bold mb-6">Launch Autonomous Campaign</h2>
+        <h2 className="text-3xl font-bold mb-6">Launch Autonomous Campaign</h2>
         <div className="grid md:grid-cols-3 gap-4 mb-6">
           <div className="space-y-2">
             <Label htmlFor="product">Product Name</Label>
@@ -146,7 +151,7 @@ export default function HomePage() {
             {loading ? (
               <span className="flex items-center gap-2">
                 <motion.span
-                  className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                  className="inline-block w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full"
                   animate={{ rotate: 360 }}
                   transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
                 />

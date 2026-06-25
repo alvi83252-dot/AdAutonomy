@@ -174,7 +174,7 @@ export default function VideosPage() {
     >
       <div className="grid lg:grid-cols-2 gap-6">
         <AnimatedCard className="space-y-5">
-          <div className="flex items-center gap-2 text-indigo-400">
+          <div className="flex items-center gap-2 text-primary">
             <Clapperboard className="w-5 h-5" />
             <h2 className="font-semibold text-lg">Create Advertisement</h2>
           </div>
@@ -223,11 +223,20 @@ export default function VideosPage() {
             </Label>
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
             <div
+              role="button"
+              tabIndex={imageOptimizing ? -1 : 0}
+              aria-label="Upload product image"
               onClick={() => !imageOptimizing && fileRef.current?.click()}
+              onKeyDown={(e) => {
+                if ((e.key === 'Enter' || e.key === ' ') && !imageOptimizing) {
+                  e.preventDefault();
+                  fileRef.current?.click();
+                }
+              }}
               className={cn(
                 'border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors',
-                'hover:border-indigo-500/50 hover:bg-indigo-500/5',
-                imagePreview ? 'border-indigo-500/30' : 'border-border'
+                'hover:border-primary/50 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+                imagePreview ? 'border-primary/30' : 'border-border'
               )}
             >
               {imageOptimizing ? (
@@ -272,7 +281,7 @@ export default function VideosPage() {
             {isGenerating || step === 'ready' ? (
               <AnimatedCard>
                 <h3 className="font-semibold mb-4 flex items-center gap-2">
-                  <Video className="w-4 h-4 text-purple-400" />
+                  <Video className="w-4 h-4 text-primary" />
                   VideoAgent Pipeline
                 </h3>
                 <div className="space-y-3">
@@ -291,7 +300,7 @@ export default function VideosPage() {
                         transition={{ delay: i * 0.08 }}
                         className={cn(
                           'flex items-center gap-3 p-3 rounded-lg text-sm',
-                          isActive && 'bg-indigo-500/10 border border-indigo-500/20',
+                          isActive && 'bg-primary/10 border border-primary/20',
                           isDone && 'opacity-60'
                         )}
                       >
@@ -320,7 +329,7 @@ export default function VideosPage() {
           {script && (
             <AnimatedCard delay={0.1}>
               <h3 className="font-semibold mb-3 flex items-center gap-2">
-                <Mic className="w-4 h-4 text-indigo-400" />
+                <Mic className="w-4 h-4 text-primary" />
                 Storyboard — {script.tagline}
               </h3>
               {script.targetMarket && (
@@ -329,14 +338,14 @@ export default function VideosPage() {
               <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                 {script.scenes.map((scene, i) => (
                   <div key={scene.id} className="flex gap-3 p-2 rounded-lg bg-muted/30 text-sm">
-                    <span className="text-indigo-400 font-mono text-xs shrink-0 pt-0.5">
+                    <span className="text-primary font-mono text-xs shrink-0 pt-0.5">
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <div>
                       <p className="font-medium">{scene.headline}</p>
                       <p className="text-muted-foreground text-xs">{scene.subtext}</p>
-                      <p className="text-xs text-purple-300/80 mt-1 italic">&ldquo;{scene.narration}&rdquo;</p>
-                      <p className="text-xs text-purple-400 mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-1 italic">&ldquo;{scene.narration}&rdquo;</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         {scene.duration}s · {scene.animation}
                       </p>
                     </div>
@@ -379,7 +388,7 @@ export default function VideosPage() {
                 {step === 'rendering' && (
                   <div className="w-full max-w-xs h-2 rounded-full bg-muted overflow-hidden">
                     <motion.div
-                      className="h-full bg-gradient-to-r from-indigo-500 to-purple-500"
+                      className="h-full bg-primary"
                       style={{ width: `${progress * 100}%` }}
                     />
                   </div>

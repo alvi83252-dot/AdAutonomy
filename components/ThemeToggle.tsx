@@ -19,7 +19,7 @@ export function ThemeToggle() {
   useEffect(() => setMounted(true), []);
 
   if (!mounted) {
-    return <div className="w-[108px] h-9 rounded-full bg-muted/50 animate-pulse" />;
+    return <div className="w-[120px] h-11 rounded-full bg-muted/50 animate-pulse" />;
   }
 
   const current = theme || 'dark';
@@ -39,7 +39,7 @@ export function ThemeToggle() {
             key={value}
             onClick={() => handleThemeChange(value)}
             className={cn(
-              'relative z-10 p-2 rounded-full transition-colors duration-200',
+              'relative z-10 inline-flex items-center justify-center p-2.5 rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
               isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
             )}
             title={label}

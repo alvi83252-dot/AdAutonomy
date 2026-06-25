@@ -99,12 +99,12 @@ export function PersonalAssistant() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 right-6 z-[90] w-[380px] max-w-[calc(100vw-3rem)] h-[520px] max-h-[calc(100vh-8rem)] flex flex-col rounded-2xl border border-border/50 bg-background/95 backdrop-blur-xl shadow-2xl shadow-indigo-500/10 overflow-hidden"
+            className="fixed bottom-24 right-6 z-[90] w-[380px] max-w-[calc(100vw-3rem)] h-[520px] max-h-[calc(100vh-8rem)] flex flex-col rounded-2xl border border-border/50 bg-background/95 backdrop-blur-xl shadow-2xl shadow-primary/10 overflow-hidden"
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-gradient-to-r from-indigo-500/10 to-purple-500/10">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-primary/10">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                  <Bot className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                  <Bot className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <div>
                   <p className="font-semibold text-sm">Personal Assistant</p>
@@ -134,7 +134,7 @@ export function PersonalAssistant() {
                     className={cn(
                       'max-w-[85%] rounded-2xl px-3 py-2 text-sm',
                       msg.role === 'user'
-                        ? 'bg-indigo-500 text-white rounded-br-md'
+                        ? 'bg-primary text-primary-foreground rounded-br-md'
                         : 'bg-muted/50 border border-border/50 rounded-bl-md'
                     )}
                   >
@@ -162,7 +162,7 @@ export function PersonalAssistant() {
                   <button
                     key={prompt}
                     onClick={() => sendMessage(prompt)}
-                    className="text-xs px-2.5 py-1 rounded-full border border-border/50 hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-xs px-2.5 py-1 rounded-full border border-border/50 hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {prompt}
                   </button>
@@ -177,7 +177,7 @@ export function PersonalAssistant() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
                 placeholder="Ask me anything..."
-                className="flex-1 bg-muted/50 border border-border/50 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                className="flex-1 bg-muted/50 border border-border/50 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 disabled={loading}
               />
               <Button
@@ -205,7 +205,7 @@ export function PersonalAssistant() {
         }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-6 z-[90] w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 flex items-center justify-center"
+        className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-6 z-[90] w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center"
         aria-label="Open personal assistant"
       >
         {open && !minimized ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
