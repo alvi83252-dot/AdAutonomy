@@ -44,6 +44,10 @@ export function saveCampaign(campaign: CampaignState): void {
   if (idx >= 0) campaigns[idx] = campaign;
   else campaigns.push(campaign);
   writeJSON('campaigns.json', campaigns);
+
+  void syncCampaignToSupabase(campaign).catch(() => {
+    /* file storage remains source of truth */
+  });
 }
 
 export function getAgentLog(): AgentMessage[] {
@@ -73,15 +77,15 @@ export function updateAgentMemory(agent: string, memory: Partial<AgentMemory>): 
 }
 
 export async function initSupabase() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !key) return null;
+  const { getSupabaseServer } = await import('@/lib/supabase/client');
+  const client = getSupabaseServer();
+  if (!client) return null;
 
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const client = createClient(url, key);
-    await client.from('campaigns').select('id').limit(1);
+    const { error } = await client.from('campaigns').select('id').limit(1);
+    if (error && error.code !== 'PGRST116' && !error.message.includes('does not exist')) {
+      throw error;
+    }
     return client;
   } catch {
     if (process.env.USE_SQLITE_FALLBACK === 'true') {
@@ -89,4 +93,16 @@ export async function initSupabase() {
     }
     return null;
   }
+}
+
+async function syncCampaignToSupabase(campaign: CampaignState): Promise<void> {
+  const client = await initSupabase();
+  if (!client) return;
+
+  await client.from('campaigns').upsert({
+    id: campaign.id,
+    data: campaign,
+    status: campaign.status,
+    updated_at: campaign.updatedAt,
+  });
 }

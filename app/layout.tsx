@@ -1,13 +1,10 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Navbar } from '@/components/Navbar';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AppShell } from '@/components/AppShell';
 import { PersonalAssistant } from '@/components/PersonalAssistant';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'AdAutonomy — Autonomous Advertising Platform',
@@ -17,7 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen parallax-bg transition-colors duration-500`}>
+      <body className="font-sans min-h-screen parallax-bg transition-colors duration-500">
         <ThemeProvider>
           <ErrorBoundary>
             <Navbar />

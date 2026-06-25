@@ -43,8 +43,31 @@ Key variables:
 | `PAYPAL_CLIENT_ID` | PayPal Sandbox client ID | — |
 | `PAYPAL_CLIENT_SECRET` | PayPal Sandbox secret | — |
 | `USE_SQLITE_FALLBACK` | File-based storage fallback | `true` |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | — |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase publishable (anon) key | — |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase secret (server) key | — |
 
-The app runs fully offline with `LLM_PROVIDER=mock` and no API keys.
+### Supabase
+
+1. Copy credentials into `.env.local` (see `.env.example`).
+2. In the [Supabase SQL Editor](https://supabase.com/dashboard), run `supabase/schema.sql` to create tables.
+3. Campaigns sync to Supabase on save; `data/` JSON files remain the offline fallback.
+
+**Two ways to connect to the same database:**
+
+| Method | Env var | Used for |
+|--------|---------|----------|
+| Supabase API | `NEXT_PUBLIC_SUPABASE_URL` + keys | Your Next.js app (`@supabase/supabase-js`) |
+| Direct Postgres | `DATABASE_URL` | `psql`, DBeaver, Prisma/Drizzle migrations, raw SQL |
+
+Both point at the same PostgreSQL database Supabase hosts for you.
+
+Install Supabase agent skills (optional, for Cursor):
+
+```bash
+npx skills add supabase/agent-skills
+```
+
 
 ## Architecture
 
