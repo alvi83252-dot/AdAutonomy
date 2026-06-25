@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ payment });
       }
       case 'approve': {
-        const payment = await approvePayment(paymentId);
+        const payment = await approvePayment(paymentId, amount || 100);
         return NextResponse.json({ payment });
       }
       case 'refund': {

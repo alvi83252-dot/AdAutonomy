@@ -1,8 +1,13 @@
-import { complete, parseJSON } from '@/lib/llm/provider';
 import { sendMessage } from '@/lib/agents/messaging';
 import { withRetry } from '@/lib/agents/consensus';
 import { updateAgentMemory } from '@/lib/storage/db';
-import type { CampaignState, SimulationResult } from '@/lib/types';
+import {
+  createSimulationInput,
+  hasModalEndpoint,
+  runLocalSimulation,
+  runModalSimulation,
+} from '@/lib/modal/simulation';
+import type { CampaignState } from '@/lib/types';
 
 export async function runSimulationAgent(campaign: CampaignState): Promise<CampaignState> {
   const totalReach = campaign.audiences.reduce((sum, a) => sum + a.reach, 0);
@@ -10,35 +15,49 @@ export async function runSimulationAgent(campaign: CampaignState): Promise<Campa
     ? campaign.audiences.reduce((sum, a) => sum + a.costPerClick, 0) / campaign.audiences.length
     : 1.5;
 
-  const { result, confidence, usedFallback } = await withRetry(
-    async () => {
-      const prompt = `Simulate campaign performance for:
-product: ${campaign.brief.productName}
-channels: ${campaign.audiences.map((a) => a.platform).join(', ')}
-total reach: ${totalReach}
-avg CPC: ${avgCpc}
-Return JSON with impressions, clicks, conversions, ctr, cpc, roas, projectedRevenue.`;
+  const input = createSimulationInput({
+    campaignId: campaign.id,
+    productName: campaign.brief.productName,
+    totalReach,
+    averageCpc: avgCpc,
+    budget: campaign.brief.budget ?? 5000,
+    creativeCount: campaign.creatives.length,
+    channelCount: campaign.audiences.length,
+  });
 
-      const response = await complete(prompt, { task: 'simulation' });
-      const simulation = parseJSON<SimulationResult>(response.content);
+  const modalConfigured = hasModalEndpoint();
+  const { result, confidence, usedFallback } = modalConfigured
+    ? await withRetry(
+        () => runModalSimulation(input),
+        () => runLocalSimulation(input, 'Modal request failed after retry'),
+        'SimulationAgent'
+      )
+    : {
+        result: runLocalSimulation(input, 'Modal endpoint is not configured'),
+        confidence: 0.75,
+        usedFallback: true,
+      };
 
-      await sendMessage('SimulationAgent', 'InvestorAgent', 'response', { roas: simulation.roas }, response.confidence);
-
-      return simulation;
+  await sendMessage(
+    'SimulationAgent',
+    'InvestorAgent',
+    'response',
+    {
+      roas: result.roas,
+      computeProvider: result.compute?.provider ?? 'local',
+      simulationRuns: result.compute?.runs ?? input.runs,
     },
-    () => ({
-      impressions: totalReach * 2,
-      clicks: Math.round(totalReach * 0.03),
-      conversions: Math.round(totalReach * 0.0015),
-      ctr: 3.0,
-      cpc: avgCpc,
-      roas: 2.8,
-      projectedRevenue: 15000,
-    }),
-    'SimulationAgent'
+    confidence
   );
 
-  updateAgentMemory('SimulationAgent', { confidence, notes: [usedFallback ? 'Fallback simulation' : 'Simulation complete'] });
+  updateAgentMemory('SimulationAgent', {
+    confidence,
+    notes: [
+      usedFallback
+        ? `Local compute fallback (${result.compute?.runs ?? input.runs} runs)`
+        : `Modal serverless compute (${result.compute?.runs ?? input.runs} runs)`,
+    ],
+  });
 
   return { ...campaign, simulation: result, currentStep: 4, updatedAt: new Date().toISOString() };
 }

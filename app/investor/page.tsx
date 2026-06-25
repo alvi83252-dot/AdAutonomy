@@ -51,6 +51,34 @@ export default function InvestorPage() {
               </AnimatedCard>
             )}
 
+            {c.finance && (
+              <AnimatedCard>
+                <h2 className="text-lg font-semibold text-cyan-400 mb-4">
+                  Seapoint Financial Control
+                </h2>
+                <div className="grid md:grid-cols-4 gap-4">
+                  <div className="text-center p-4 bg-muted/50 rounded-lg">
+                    <p className="text-2xl font-bold">${c.finance.currentCash.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">Consolidated Cash</p>
+                  </div>
+                  <div className="text-center p-4 bg-muted/50 rounded-lg">
+                    <p className="text-2xl font-bold">${c.finance.monthlyBurn.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">Monthly Burn</p>
+                  </div>
+                  <div className="text-center p-4 bg-muted/50 rounded-lg">
+                    <p className="text-2xl font-bold">{c.finance.runwayMonths} mo</p>
+                    <p className="text-xs text-muted-foreground">Cash Runway</p>
+                  </div>
+                  <div className="text-center p-4 bg-muted/50 rounded-lg">
+                    <p className="text-2xl font-bold text-yellow-400">
+                      {c.finance.pendingApprovals}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Approvals Needed</p>
+                  </div>
+                </div>
+              </AnimatedCard>
+            )}
+
             {payments.length > 0 && (
               <AnimatedCard>
                 <h2 className="text-lg font-semibold text-purple-400 mb-4">PaymentAgent Transactions</h2>

@@ -98,6 +98,33 @@ export function generateCampaignPack(campaign: CampaignState): string {
   </div>
 
   ${
+    campaign.orchestration
+      ? `<div class="section">
+    <h2>Manus Orchestration Plan</h2>
+    <p><strong>Provider:</strong> ${campaign.orchestration.provider === 'manus' ? 'Manus API v2' : 'Local supervisor fallback'}</p>
+    <p><strong>Strategy:</strong> ${escapeHtml(campaign.orchestration.executionStrategy)}</p>
+    <p><strong>Delegated agent steps:</strong> ${campaign.orchestration.steps.length}</p>
+  </div>`
+      : ''
+  }
+
+  ${
+    campaign.finance
+      ? `<div class="section">
+    <h2>Seapoint Financial Control</h2>
+    <div class="metrics">
+      <div class="metric"><div class="value">$${campaign.finance.currentCash.toLocaleString()}</div><div class="label">Consolidated Cash</div></div>
+      <div class="metric"><div class="value">$${campaign.finance.monthlyBurn.toLocaleString()}</div><div class="label">Monthly Burn</div></div>
+      <div class="metric"><div class="value">${campaign.finance.runwayMonths} mo</div><div class="label">Cash Runway</div></div>
+      <div class="metric"><div class="value">${campaign.finance.pendingApprovals}</div><div class="label">Pending Approvals</div></div>
+    </div>
+    <p style="margin-top:16px;"><strong>Net campaign cash flow:</strong> $${campaign.finance.netCashFlow.toLocaleString()}</p>
+    <p><strong>Bookkeeping entries categorised:</strong> ${campaign.finance.bookkeeping.length}</p>
+  </div>`
+      : ''
+  }
+
+  ${
     campaign.investorSummary
       ? `<div class="section">
     <h2>Investor Summary</h2>
@@ -110,7 +137,7 @@ export function generateCampaignPack(campaign: CampaignState): string {
 
   <div class="footer">
     <p>AdAutonomy — Autonomous Advertising Platform</p>
-    <p>Powered by Cursor · OpenAI · Supabase · PayPal Sandbox · Vercel Eve</p>
+    <p>Powered by Cursor · OpenAI · Supabase · Modal · Seapoint · PayPal Sandbox · Vercel Eve</p>
     <p>Halkin Offices — Venue Partner</p>
   </div>
 </body>

@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "modal:serve": "modal serve modal/app.py",
+    "modal:deploy": "modal deploy modal/app.py"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.4",
