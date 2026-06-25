@@ -140,6 +140,7 @@ export async function mockComplete(prompt: string, task?: string): Promise<LLMRe
     model: 'mock-llm-v1',
     tokensUsed: 150,
     confidence: 0.85 + Math.random() * 0.1,
+    latencyMs: Math.random() * 500,
   };
 }
 

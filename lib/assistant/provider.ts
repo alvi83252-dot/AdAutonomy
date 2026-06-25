@@ -1,20 +1,6 @@
+import { complete } from '@/lib/llm/provider';
+import { SYSTEM_PROMPTS } from '@/lib/llm/prompts';
 import type { AssistantMessage } from '@/lib/types';
-
-const SYSTEM_PROMPT = `You are AdAutonomy Personal Assistant — an expert AI helper for an autonomous advertising platform.
-
-You help users with:
-- Launching and managing ad campaigns
-- Creating ad videos and creatives
-- Publishing to social media (Instagram, TikTok, LinkedIn, X, YouTube, Facebook)
-- Understanding campaign analytics, ROI, and investor summaries
-- PayPal sandbox payments and deployment
-
-Be concise, friendly, and action-oriented. When users ask to do something, explain the steps and which part of AdAutonomy to use (Home, Videos, Deploy, etc.).
-
-If OpenAI is not configured, you still provide helpful guidance based on platform knowledge.
-
-Current platform pages: Home (/), Brief, Creative, Videos (/videos), Simulation, Deploy (/deploy).
-Personal assistant is always available via the chat button.`;
 
 const MOCK_RESPONSES: Record<string, string> = {
   campaign: "To launch a campaign, go to **Home**, enter your product name, target market, and goal, then click **Launch Autonomous Campaign**. Our 10 AI agents will handle the rest!",
@@ -45,33 +31,24 @@ export async function chat(
 
   if (hasOpenAI) {
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
-            ...messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
-            { role: 'user', content: userMessage },
-          ],
-          temperature: 0.7,
-          max_tokens: 800,
-        }),
+      const history = messages.slice(-10).map((m) => `${m.role}: ${m.content}`).join('\n');
+      const prompt = `Previous conversation:\n${history}\n\nUser: ${userMessage}\n\nRespond as the AdAutonomy Personal Assistant. Be concise and action-oriented.`;
+
+      const response = await complete(prompt, {
+        task: 'assistant',
+        temperature: 0.7,
+        maxTokens: 800,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        return {
-          reply: data.choices?.[0]?.message?.content || 'Sorry, I could not generate a response.',
-          model: data.model || 'gpt-4o-mini',
-        };
-      }
+      return {
+        reply: response.content || 'Sorry, I could not generate a response.',
+        model: response.model,
+      };
     } catch {
-      /* fall through to mock */
+      return {
+        reply: mockAssistantReply(userMessage),
+        model: 'adautonomy-assistant-fallback',
+      };
     }
   }
 
@@ -79,4 +56,81 @@ export async function chat(
     reply: mockAssistantReply(userMessage),
     model: 'adautonomy-assistant-mock',
   };
+}
+
+export async function* chatStream(
+  messages: AssistantMessage[],
+  userMessage: string
+): AsyncGenerator<string> {
+  const hasOpenAI = process.env.LLM_PROVIDER === 'openai' && !!process.env.OPENAI_API_KEY;
+  const openaiKey = process.env.OPENAI_API_KEY;
+
+  if (hasOpenAI && openaiKey) {
+    try {
+      const history = messages.slice(-10).map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${openaiKey}`,
+        },
+        body: JSON.stringify({
+          model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: SYSTEM_PROMPTS.assistant },
+            ...history,
+            { role: 'user', content: userMessage },
+          ],
+          temperature: 0.7,
+          max_tokens: 800,
+          stream: true,
+        }),
+      });
+
+      if (!response.ok) {
+        yield mockAssistantReply(userMessage);
+        return;
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || !trimmed.startsWith('data: ')) continue;
+            const data = trimmed.slice(6);
+            if (data === '[DONE]') return;
+
+            try {
+              const parsed = JSON.parse(data);
+              const delta = parsed.choices?.[0]?.delta?.content;
+              if (delta) yield delta;
+            } catch {
+              /* skip malformed chunks */
+            }
+          }
+        }
+      }
+      return;
+    } catch {
+      yield mockAssistantReply(userMessage);
+      return;
+    }
+  }
+
+  yield mockAssistantReply(userMessage);
 }
