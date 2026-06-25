@@ -2,19 +2,41 @@ import fs from 'fs';
 import path from 'path';
 import type { CampaignState, AgentMessage, AgentMemory } from '@/lib/types';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
+function resolveDataDir(): string {
+  if (process.env.ADAUTONOMY_DATA_DIR) {
+    return process.env.ADAUTONOMY_DATA_DIR;
+  }
+  // Vercel/Lambda only allow writes under /tmp
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return path.join('/tmp', 'adautonomy-data');
+  }
+  return path.join(process.cwd(), 'data');
+}
 
-function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+const DATA_DIR = resolveDataDir();
+
+function ensureDataDir(): boolean {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    return true;
+  } catch (err) {
+    console.warn('[DB] Unable to create data directory:', err);
+    return false;
   }
 }
 
 function readJSON<T>(filename: string, fallback: T): T {
-  ensureDataDir();
   const filepath = path.join(DATA_DIR, filename);
   if (!fs.existsSync(filepath)) {
-    fs.writeFileSync(filepath, JSON.stringify(fallback, null, 2));
+    if (ensureDataDir()) {
+      try {
+        fs.writeFileSync(filepath, JSON.stringify(fallback, null, 2));
+      } catch {
+        /* read-only FS — return fallback without persisting */
+      }
+    }
     return fallback;
   }
   try {
@@ -25,9 +47,13 @@ function readJSON<T>(filename: string, fallback: T): T {
 }
 
 function writeJSON<T>(filename: string, data: T): void {
-  ensureDataDir();
-  const filepath = path.join(DATA_DIR, filename);
-  fs.writeFileSync(filepath, JSON.stringify(data, null, 2));
+  if (!ensureDataDir()) return;
+  try {
+    const filepath = path.join(DATA_DIR, filename);
+    fs.writeFileSync(filepath, JSON.stringify(data, null, 2));
+  } catch (err) {
+    console.warn(`[DB] Unable to write ${filename}:`, err);
+  }
 }
 
 export function getCampaigns(): CampaignState[] {
@@ -45,8 +71,8 @@ export function saveCampaign(campaign: CampaignState): void {
   else campaigns.push(campaign);
   writeJSON('campaigns.json', campaigns);
 
-  void syncCampaignToSupabase(campaign).catch(() => {
-    /* file storage remains source of truth */
+  void syncCampaignToSupabase(campaign).catch((err) => {
+    console.warn('[DB] Supabase sync failed:', err);
   });
 }
 
@@ -89,7 +115,7 @@ export async function initSupabase() {
     return client;
   } catch {
     if (process.env.USE_SQLITE_FALLBACK === 'true') {
-      console.log('[DB] Supabase unavailable, using file-based storage');
+      console.log('[DB] Supabase unavailable, using in-memory/file fallback');
     }
     return null;
   }
@@ -99,10 +125,14 @@ async function syncCampaignToSupabase(campaign: CampaignState): Promise<void> {
   const client = await initSupabase();
   if (!client) return;
 
-  await client.from('campaigns').upsert({
+  const { error } = await client.from('campaigns').upsert({
     id: campaign.id,
     data: campaign,
     status: campaign.status,
     updated_at: campaign.updatedAt,
   });
+
+  if (error) {
+    throw new Error(error.message);
+  }
 }

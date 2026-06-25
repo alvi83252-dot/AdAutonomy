@@ -51,6 +51,11 @@ type ManusMessagesResponse = {
 export async function createCampaignOrchestration(
   campaign: CampaignState
 ): Promise<ManusOrchestration> {
+  // Serverless hosts have short request limits — use local plan unless opted in.
+  if (process.env.VERCEL === '1' && process.env.MANUS_ON_VERCEL !== 'true') {
+    return createLocalOrchestration(campaign, 'Local orchestration (serverless fast path)');
+  }
+
   if (
     process.env.MANUS_ORCHESTRATION_ENABLED !== 'true' ||
     !process.env.MANUS_API_KEY

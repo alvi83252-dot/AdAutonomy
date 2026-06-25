@@ -39,7 +39,10 @@ export default function HomePage() {
         body: JSON.stringify({ productName, targetMarket, campaignGoal }),
       });
 
-      if (!res.ok) throw new Error('Pipeline failed');
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || `Pipeline failed (${res.status})`);
+      }
       const data = await res.json();
       setCampaign(data.campaign);
       setMessages(data.messages || []);

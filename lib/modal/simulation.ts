@@ -38,11 +38,13 @@ export async function runModalSimulation(input: ModalSimulationInput): Promise<S
   const endpoint = process.env.MODAL_SIMULATION_URL;
   if (!endpoint) throw new Error('MODAL_SIMULATION_URL is not configured');
 
-  const timeoutMs = readPositiveInteger(
-    process.env.MODAL_REQUEST_TIMEOUT_MS,
-    DEFAULT_TIMEOUT_MS,
-    120_000
-  );
+  const timeoutMs =
+    process.env.VERCEL === '1'
+      ? Math.min(
+          readPositiveInteger(process.env.MODAL_REQUEST_TIMEOUT_MS, DEFAULT_TIMEOUT_MS, 120_000),
+          8_000
+        )
+      : readPositiveInteger(process.env.MODAL_REQUEST_TIMEOUT_MS, DEFAULT_TIMEOUT_MS, 120_000);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   const startedAt = Date.now();
