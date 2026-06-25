@@ -67,7 +67,19 @@ export async function createCheckout(amount: number, currency = 'USD'): Promise<
   return mockPayment('checkout', amount, currency);
 }
 
-export async function approvePayment(paymentId: string, fallbackAmount = 100): Promise<PaymentRecord> {
+type ApprovePaymentOptions = {
+  allowMock?: boolean;
+  fallbackAmount?: number;
+};
+
+export async function approvePayment(
+  paymentId: string,
+  options?: number | ApprovePaymentOptions
+): Promise<PaymentRecord> {
+  const opts: ApprovePaymentOptions =
+    typeof options === 'number' ? { fallbackAmount: options } : (options ?? {});
+  const allowMock = opts.allowMock ?? process.env.ENABLE_PAYPAL_MOCK_FALLBACK !== 'false';
+  const fallbackAmount = opts.fallbackAmount ?? 100;
   const token = await getPayPalToken();
 
   if (token && !paymentId.startsWith('mock-')) {
@@ -77,21 +89,31 @@ export async function approvePayment(paymentId: string, fallbackAmount = 100): P
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
 
+      const data = await res.json();
+
       if (res.ok) {
-        const data = await res.json();
         return {
           id: paymentId,
           type: 'checkout',
           amount: parseFloat(data.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value || '0'),
-          currency: 'USD',
+          currency: data.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.currency_code || 'USD',
           status: 'completed',
           receipt: generateReceipt(paymentId, 'checkout'),
           timestamp: new Date().toISOString(),
         };
       }
-    } catch {
-      /* fall through */
+
+      const issue = data.details?.[0]?.issue || data.message || 'Capture failed';
+      if (!allowMock) {
+        throw new Error(issue);
+      }
+    } catch (err) {
+      if (!allowMock) throw err;
     }
+  }
+
+  if (!allowMock) {
+    throw new Error('PayPal credentials missing or invalid order');
   }
 
   return {

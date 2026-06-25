@@ -16,6 +16,7 @@ const navItems = [
   { href: '/videos', label: 'Videos' },
   { href: '/simulation', label: 'Simulation' },
   { href: '/finance', label: 'Finance' },
+  { href: '/investor', label: 'Investor' },
   { href: '/deploy', label: 'Deploy' },
 ];
 
