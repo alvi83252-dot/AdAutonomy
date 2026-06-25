@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    environment:
+      - DEMO_MODE=true
+      - LLM_PROVIDER=mock
+      - USE_SQLITE_FALLBACK=true
+      - EVE_OFFLINE_MODE=true
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - supabase-db
+    restart: unless-stopped
+
+  supabase-db:
+    image: supabase/postgres:15.8.1.060
+    ports:
+      - '54322:5432'
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - supabase-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  supabase-data:

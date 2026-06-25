@@ -1,0 +1,15 @@
+{
+  "productName": "EcoBottle Pro",
+  "targetMarket": "Environmentally conscious millennials in urban areas",
+  "campaignGoal": "Drive 10,000 pre-orders in 30 days",
+  "sampleCreatives": [
+    {
+      "headline": "Hydrate Sustainably",
+      "body": "The last water bottle you'll ever need. 100% recycled materials.",
+      "cta": "Pre-Order Now",
+      "variant": "A"
+    }
+  ],
+  "sampleChannels": ["Instagram", "TikTok", "Google Ads"],
+  "expectedROAS": 3.5
+}
