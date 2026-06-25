@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
       productName: body.productName.trim(),
       tagline: body.tagline || `Check out ${body.productName}!`,
       videoFilename: body.videoFilename,
+      videoUrl: body.videoUrl,
       autoPublish: body.autoPublish !== false,
       pageUrl,
     });

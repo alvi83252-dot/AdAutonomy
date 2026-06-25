@@ -2,6 +2,9 @@
   "functions": {
     "app/api/campaign/run/route.ts": {
       "maxDuration": 60
+    },
+    "app/api/video/upload/route.ts": {
+      "maxDuration": 60
     }
   }
 }

@@ -6,6 +6,7 @@ export type SocialPost = {
   caption: string;
   hashtags: string[];
   videoFilename?: string;
+  videoUrl?: string;
   status: 'draft' | 'scheduled' | 'published' | 'failed';
   postUrl?: string;
   shareUrl?: string;
@@ -88,21 +89,28 @@ export function buildShareCaption(
 export function getPlatformShareUrl(
   platform: SocialPlatform,
   caption: string,
-  pageUrl?: string
+  pageUrl?: string,
+  videoUrl?: string
 ): string {
-  const encoded = encodeURIComponent(caption.slice(0, 200));
+  const watchLine = videoUrl ? `\n\nWatch: ${videoUrl}` : '';
+  const fullText = `${caption}${watchLine}`;
+  const encoded = encodeURIComponent(fullText.slice(0, 500));
+  const encodedUrl = encodeURIComponent(videoUrl || pageUrl || '');
   const page =
     pageUrl ||
     (typeof window !== 'undefined' ? window.location.href : '') ||
     process.env.NEXT_PUBLIC_APP_URL ||
-    'https://adautonomy.vercel.app';
+    '';
+
   switch (platform) {
     case 'twitter':
       return `https://twitter.com/intent/tweet?text=${encoded}`;
     case 'linkedin':
-      return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(page)}&summary=${encoded}`;
+      return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(videoUrl || page)}&summary=${encodeURIComponent(caption.slice(0, 200))}`;
     case 'facebook':
-      return `https://www.facebook.com/sharer/sharer.php?quote=${encoded}`;
+      return videoUrl
+        ? `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodeURIComponent(caption.slice(0, 200))}`
+        : `https://www.facebook.com/sharer/sharer.php?quote=${encoded}`;
     default:
       return PLATFORM_CONFIG[platform].uploadUrl;
   }

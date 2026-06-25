@@ -60,3 +60,18 @@ create policy "Allow public insert agent_logs" on public.agent_logs for insert w
 
 create policy "Allow public read social_posts" on public.social_posts for select using (true);
 create policy "Allow public insert social_posts" on public.social_posts for insert with check (true);
+
+-- -----------------------------------------------------------------------------
+-- Storage: public ad videos for social sharing (run once in SQL Editor)
+-- -----------------------------------------------------------------------------
+insert into storage.buckets (id, name, public)
+values ('ad-videos', 'ad-videos', true)
+on conflict (id) do update set public = true;
+
+create policy "Public read ad videos"
+on storage.objects for select
+using (bucket_id = 'ad-videos');
+
+create policy "Anyone can upload ad videos"
+on storage.objects for insert
+with check (bucket_id = 'ad-videos');

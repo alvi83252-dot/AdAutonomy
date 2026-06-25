@@ -15,9 +15,11 @@ import {
   ExternalLink,
   Copy,
   Loader2,
+  Link2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { downloadVideo } from '@/lib/video/composeVideo';
+import { uploadVideoFromBrowser } from '@/lib/supabase/videoStorage';
 import { PLATFORM_CONFIG, type SocialPlatform } from '@/lib/social/platforms';
 import type { SocialPost } from '@/lib/social/platforms';
 import { cn } from '@/lib/utils';
@@ -38,10 +40,30 @@ interface SocialSharePanelProps {
   className?: string;
 }
 
+async function uploadVideoForSharing(blob: Blob, filename: string): Promise<string> {
+  try {
+    const result = await uploadVideoFromBrowser(blob, filename);
+    return result.url;
+  } catch (browserErr) {
+    const form = new FormData();
+    form.append('video', blob, filename);
+    const res = await fetch('/api/video/upload', { method: 'POST', body: form });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(
+        data.error || (browserErr as Error).message || 'Video upload failed'
+      );
+    }
+    return data.url as string;
+  }
+}
+
 export function SocialSharePanel({ videoBlob, productName, tagline, className }: SocialSharePanelProps) {
-  const [selected, setSelected] = useState<SocialPlatform[]>(['instagram', 'tiktok']);
+  const [selected, setSelected] = useState<SocialPlatform[]>(['instagram', 'tiktok', 'twitter']);
   const [publishing, setPublishing] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [posts, setPosts] = useState<SocialPost[]>([]);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -52,8 +74,10 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
     setSelected((prev) => (prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]));
   }
 
-  function buildCaption() {
-    return `${tagline}\n\n#${productName.replace(/\s+/g, '')} #AdAutonomy`;
+  function buildCaption(extraUrl?: string) {
+    const url = extraUrl || videoUrl;
+    const base = `${tagline}\n\n#${productName.replace(/\s+/g, '')} #AdAutonomy`;
+    return url ? `${base}\n\nWatch: ${url}` : base;
   }
 
   async function copyCaption(text?: string) {
@@ -74,33 +98,60 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
 
   async function handleNativeShare() {
     if (!videoBlob) return;
-    const file = new File([videoBlob], filename, { type: videoBlob.type || 'video/webm' });
-    const shareData = { title: `${productName} Ad`, text: tagline, files: [file] };
 
-    if (navigator.canShare?.(shareData)) {
-      try {
-        await navigator.share(shareData);
-      } catch {
-        /* user cancelled */
+    setUploading(true);
+    setError('');
+    try {
+      let url = videoUrl;
+      if (!url) {
+        url = await uploadVideoForSharing(videoBlob, filename);
+        setVideoUrl(url);
       }
-    } else {
-      await copyCaption();
+
+      const file = new File([videoBlob], filename, { type: videoBlob.type || 'video/webm' });
+      const shareWithFile = { title: `${productName} Ad`, text: buildCaption(url), files: [file] };
+      const shareWithUrl = { title: `${productName} Ad`, text: buildCaption(url), url };
+
+      if (navigator.canShare?.(shareWithFile)) {
+        await navigator.share(shareWithFile);
+        return;
+      }
+      if (navigator.canShare?.(shareWithUrl)) {
+        await navigator.share(shareWithUrl);
+        return;
+      }
+
+      await copyCaption(buildCaption(url));
       handleDownload();
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        setError((err as Error).message);
+      }
+    } finally {
+      setUploading(false);
     }
   }
 
   async function handlePublish() {
-    if (selected.length === 0) {
+    if (!videoBlob || selected.length === 0) {
       setError('Select at least one platform');
       return;
     }
 
     setPublishing(true);
+    setUploading(true);
     setError('');
     setSuccessMessage('');
     setPosts([]);
 
     try {
+      let url = videoUrl;
+      if (!url) {
+        url = await uploadVideoForSharing(videoBlob, filename);
+        setVideoUrl(url);
+      }
+      setUploading(false);
+
       const res = await fetch('/api/social/post', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -109,6 +160,7 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
           productName,
           tagline,
           videoFilename: filename,
+          videoUrl: url,
           pageUrl: typeof window !== 'undefined' ? window.location.href : undefined,
           autoPublish: true,
         }),
@@ -119,17 +171,17 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
 
       const publishedPosts = data.posts as SocialPost[];
       setPosts(publishedPosts);
-      setSuccessMessage(data.message || 'Ready to share');
+      setSuccessMessage(
+        'Video uploaded! Caption copied — open each platform and paste the link or upload the file.'
+      );
 
-      if (publishedPosts[0]?.caption) {
-        await copyCaption(publishedPosts[0].caption);
-      } else {
-        await copyCaption();
-      }
+      await copyCaption(buildCaption(url));
+      handleDownload();
     } catch (err) {
       setError((err as Error).message);
     } finally {
       setPublishing(false);
+      setUploading(false);
     }
   }
 
@@ -137,13 +189,39 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
 
   return (
     <div className={cn('space-y-4', className)}>
+      {videoUrl && (
+        <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-xs flex items-start gap-2">
+          <Link2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+          <div className="min-w-0">
+            <p className="font-medium text-primary mb-1">Video hosted for sharing</p>
+            <a
+              href={videoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground break-all hover:text-primary underline"
+            >
+              {videoUrl}
+            </a>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-wrap gap-2">
         <Button variant="glow" onClick={handleDownload} className="flex-1 min-w-[140px]">
           <Download className="w-4 h-4 mr-2" />
           Download Video
         </Button>
-        <Button variant="outline" onClick={handleNativeShare} className="flex-1 min-w-[140px]">
-          <Share2 className="w-4 h-4 mr-2" />
+        <Button
+          variant="outline"
+          onClick={handleNativeShare}
+          disabled={uploading}
+          className="flex-1 min-w-[140px]"
+        >
+          {uploading ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Share2 className="w-4 h-4 mr-2" />
+          )}
           Share Device
         </Button>
         <Button variant="outline" onClick={() => copyCaption()}>
@@ -196,23 +274,25 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
           variant="glow"
           className="w-full"
           onClick={handlePublish}
-          disabled={publishing || selected.length === 0}
+          disabled={publishing || uploading || selected.length === 0}
         >
-          {publishing ? (
+          {publishing || uploading ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Publishing...
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              {uploading ? 'Uploading video...' : 'Publishing...'}
             </>
           ) : (
             <>
-              <Share2 className="w-4 h-4 mr-2" /> Auto-Publish to {selected.length} Platform
+              <Share2 className="w-4 h-4 mr-2" /> Share Video to {selected.length} Platform
               {selected.length !== 1 ? 's' : ''}
             </>
           )}
         </Button>
 
         <p className="text-xs text-muted-foreground">
-          Downloads your video, copies the caption, then opens platform upload/share links. Add API
-          keys in env for live auto-posting.
+          Uploads your video to cloud storage, copies caption + link, downloads the file, then opens
+          each platform so you can post. Instagram/TikTok need the downloaded file; X/LinkedIn/WhatsApp
+          can use the link.
         </p>
 
         <AnimatePresence>
@@ -226,8 +306,7 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
                 <p className="text-xs text-green-400 mb-2">{successMessage}</p>
               )}
               {posts.map((post) => {
-                const shareUrl =
-                  post.shareUrl || PLATFORM_CONFIG[post.platform].uploadUrl;
+                const shareUrl = post.shareUrl || PLATFORM_CONFIG[post.platform].uploadUrl;
                 return (
                   <div
                     key={post.id}

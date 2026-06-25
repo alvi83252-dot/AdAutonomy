@@ -28,6 +28,7 @@ export type PublishInput = {
   productName: string;
   tagline: string;
   videoFilename?: string;
+  videoUrl?: string;
   autoPublish?: boolean;
   pageUrl?: string;
 };
@@ -53,8 +54,9 @@ export async function publishToSocial(input: PublishInput): Promise<SocialPost[]
       caption,
       hashtags,
       videoFilename: input.videoFilename,
+      videoUrl: input.videoUrl,
       status,
-      shareUrl: getPlatformShareUrl(platform, caption, pageUrl),
+      shareUrl: getPlatformShareUrl(platform, caption, pageUrl, input.videoUrl),
       postUrl: hasRealCredentials ? `https://${platform}.com/post/mock-${Date.now()}` : undefined,
       scheduledAt: status === 'scheduled' ? now : undefined,
       publishedAt: status === 'published' ? now : undefined,
