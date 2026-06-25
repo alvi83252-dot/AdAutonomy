@@ -18,11 +18,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { downloadVideo } from '@/lib/video/composeVideo';
-import {
-  PLATFORM_CONFIG,
-  getPlatformShareUrl,
-  type SocialPlatform,
-} from '@/lib/social/platforms';
+import { PLATFORM_CONFIG, type SocialPlatform } from '@/lib/social/platforms';
 import type { SocialPost } from '@/lib/social/platforms';
 import { cn } from '@/lib/utils';
 
@@ -48,11 +44,27 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
   const [posts, setPosts] = useState<SocialPost[]>([]);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const filename = `${productName.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-ad.webm`;
 
   function togglePlatform(p: SocialPlatform) {
     setSelected((prev) => (prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]));
+  }
+
+  function buildCaption() {
+    return `${tagline}\n\n#${productName.replace(/\s+/g, '')} #AdAutonomy`;
+  }
+
+  async function copyCaption(text?: string) {
+    const caption = text || buildCaption();
+    try {
+      await navigator.clipboard.writeText(caption);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setError('Could not copy caption — select and copy manually.');
+    }
   }
 
   async function handleDownload() {
@@ -62,7 +74,7 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
 
   async function handleNativeShare() {
     if (!videoBlob) return;
-    const file = new File([videoBlob], filename, { type: videoBlob.type });
+    const file = new File([videoBlob], filename, { type: videoBlob.type || 'video/webm' });
     const shareData = { title: `${productName} Ad`, text: tagline, files: [file] };
 
     if (navigator.canShare?.(shareData)) {
@@ -72,6 +84,7 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
         /* user cancelled */
       }
     } else {
+      await copyCaption();
       handleDownload();
     }
   }
@@ -84,6 +97,7 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
 
     setPublishing(true);
     setError('');
+    setSuccessMessage('');
     setPosts([]);
 
     try {
@@ -95,32 +109,28 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
           productName,
           tagline,
           videoFilename: filename,
+          pageUrl: typeof window !== 'undefined' ? window.location.href : undefined,
           autoPublish: true,
         }),
       });
 
-      if (!res.ok) throw new Error('Publishing failed');
       const data = await res.json();
-      setPosts(data.posts);
+      if (!res.ok) throw new Error(data.error || 'Publishing failed');
 
-      for (const post of data.posts as SocialPost[]) {
-        const url = getPlatformShareUrl(post.platform, post.caption);
-        if (data.mockMode) {
-          window.open(PLATFORM_CONFIG[post.platform].uploadUrl, '_blank', 'noopener');
-        }
+      const publishedPosts = data.posts as SocialPost[];
+      setPosts(publishedPosts);
+      setSuccessMessage(data.message || 'Ready to share');
+
+      if (publishedPosts[0]?.caption) {
+        await copyCaption(publishedPosts[0].caption);
+      } else {
+        await copyCaption();
       }
     } catch (err) {
       setError((err as Error).message);
     } finally {
       setPublishing(false);
     }
-  }
-
-  function copyCaption() {
-    const caption = `${tagline}\n\n#${productName.replace(/\s+/g, '')} #AdAutonomy`;
-    navigator.clipboard.writeText(caption);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   }
 
   if (!videoBlob) return null;
@@ -136,7 +146,7 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
           <Share2 className="w-4 h-4 mr-2" />
           Share Device
         </Button>
-        <Button variant="outline" onClick={copyCaption}>
+        <Button variant="outline" onClick={() => copyCaption()}>
           <Copy className="w-4 h-4 mr-2" />
           {copied ? 'Copied!' : 'Copy Caption'}
         </Button>
@@ -157,6 +167,7 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
             return (
               <button
                 key={platform}
+                type="button"
                 onClick={() => togglePlatform(platform)}
                 className={cn(
                   'flex flex-col items-center gap-1.5 p-3 rounded-lg border text-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
@@ -165,7 +176,12 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
                     : 'border-border/50 hover:border-border text-muted-foreground hover:text-foreground'
                 )}
               >
-                <div className={cn('w-8 h-8 rounded-full bg-gradient-to-br flex items-center justify-center', config.color)}>
+                <div
+                  className={cn(
+                    'w-8 h-8 rounded-full bg-gradient-to-br flex items-center justify-center',
+                    config.color
+                  )}
+                >
                   <Icon className="w-4 h-4 text-white" />
                 </div>
                 <span className="truncate w-full text-center">{config.name.split(' ')[0]}</span>
@@ -183,14 +199,20 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
           disabled={publishing || selected.length === 0}
         >
           {publishing ? (
-            <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Publishing...</>
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Publishing...
+            </>
           ) : (
-            <><Share2 className="w-4 h-4 mr-2" /> Auto-Publish to {selected.length} Platform{selected.length !== 1 ? 's' : ''}</>
+            <>
+              <Share2 className="w-4 h-4 mr-2" /> Auto-Publish to {selected.length} Platform
+              {selected.length !== 1 ? 's' : ''}
+            </>
           )}
         </Button>
 
         <p className="text-xs text-muted-foreground">
-          Simulated publish opens upload pages. Add social API keys in <code className="text-primary">.env.local</code> for live auto-posting.
+          Downloads your video, copies the caption, then opens platform upload/share links. Add API
+          keys in env for live auto-posting.
         </p>
 
         <AnimatePresence>
@@ -200,23 +222,36 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
               animate={{ opacity: 1, height: 'auto' }}
               className="space-y-2 pt-2 border-t border-border/50"
             >
-              {posts.map((post) => (
-                <div key={post.id} className="flex items-center gap-2 p-2 rounded-lg bg-success/10 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <span className="font-medium capitalize">{post.platform}</span>
-                    <span className="text-muted-foreground ml-2 text-xs capitalize">{post.status}</span>
-                  </div>
-                  <a
-                    href={PLATFORM_CONFIG[post.platform].uploadUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:text-primary/80"
+              {successMessage && (
+                <p className="text-xs text-green-400 mb-2">{successMessage}</p>
+              )}
+              {posts.map((post) => {
+                const shareUrl =
+                  post.shareUrl || PLATFORM_CONFIG[post.platform].uploadUrl;
+                return (
+                  <div
+                    key={post.id}
+                    className="flex items-center gap-2 p-2 rounded-lg bg-success/10 text-sm"
                   >
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                </div>
-              ))}
+                    <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <span className="font-medium capitalize">{post.platform}</span>
+                      <span className="text-muted-foreground ml-2 text-xs capitalize">
+                        {post.status}
+                      </span>
+                    </div>
+                    <a
+                      href={shareUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-primary hover:text-primary/80 text-xs font-medium px-2 py-1 rounded-md border border-primary/30"
+                    >
+                      Open
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                );
+              })}
             </motion.div>
           )}
         </AnimatePresence>

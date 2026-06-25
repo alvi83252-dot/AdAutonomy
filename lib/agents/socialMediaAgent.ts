@@ -1,30 +1,26 @@
-import fs from 'fs';
-import path from 'path';
 import { sendMessage } from '@/lib/agents/messaging';
-import { updateAgentMemory } from '@/lib/storage/db';
-import { buildShareCaption, type SocialPlatform, type SocialPost } from '@/lib/social/platforms';
+import {
+  readStorageJSON,
+  syncSocialPostToSupabase,
+  updateAgentMemory,
+  writeStorageJSON,
+} from '@/lib/storage/db';
+import {
+  buildShareCaption,
+  getPlatformShareUrl,
+  type SocialPlatform,
+  type SocialPost,
+} from '@/lib/social/platforms';
 import { generateId } from '@/lib/utils';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
-
-function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-}
+const SOCIAL_POSTS_FILE = 'social_posts.json';
 
 export function getSocialPosts(): SocialPost[] {
-  ensureDataDir();
-  const file = path.join(DATA_DIR, 'social_posts.json');
-  if (!fs.existsSync(file)) return [];
-  try {
-    return JSON.parse(fs.readFileSync(file, 'utf-8'));
-  } catch {
-    return [];
-  }
+  return readStorageJSON<SocialPost[]>(SOCIAL_POSTS_FILE, []);
 }
 
 function saveSocialPosts(posts: SocialPost[]) {
-  ensureDataDir();
-  fs.writeFileSync(path.join(DATA_DIR, 'social_posts.json'), JSON.stringify(posts, null, 2));
+  writeStorageJSON(SOCIAL_POSTS_FILE, posts);
 }
 
 export type PublishInput = {
@@ -33,11 +29,13 @@ export type PublishInput = {
   tagline: string;
   videoFilename?: string;
   autoPublish?: boolean;
+  pageUrl?: string;
 };
 
 export async function publishToSocial(input: PublishInput): Promise<SocialPost[]> {
   const results: SocialPost[] = [];
   const now = new Date().toISOString();
+  const pageUrl = input.pageUrl || process.env.NEXT_PUBLIC_APP_URL || '';
 
   for (const platform of input.platforms) {
     const { caption, hashtags } = buildShareCaption(input.productName, input.tagline, platform);
@@ -56,6 +54,7 @@ export async function publishToSocial(input: PublishInput): Promise<SocialPost[]
       hashtags,
       videoFilename: input.videoFilename,
       status,
+      shareUrl: getPlatformShareUrl(platform, caption, pageUrl),
       postUrl: hasRealCredentials ? `https://${platform}.com/post/mock-${Date.now()}` : undefined,
       scheduledAt: status === 'scheduled' ? now : undefined,
       publishedAt: status === 'published' ? now : undefined,
@@ -63,6 +62,15 @@ export async function publishToSocial(input: PublishInput): Promise<SocialPost[]
     };
 
     results.push(post);
+
+    void syncSocialPostToSupabase({
+      id: post.id,
+      platform: post.platform,
+      status: post.status,
+      data: post as unknown as Record<string, unknown>,
+    }).catch((err) => {
+      console.warn('[Social] Supabase sync failed:', err);
+    });
 
     await sendMessage('DeploymentAgent', 'Orchestrator', 'info', {
       action: 'social_publish',

@@ -8,6 +8,7 @@ export type SocialPost = {
   videoFilename?: string;
   status: 'draft' | 'scheduled' | 'published' | 'failed';
   postUrl?: string;
+  shareUrl?: string;
   scheduledAt?: string;
   publishedAt?: string;
   createdAt: string;
@@ -84,13 +85,24 @@ export function buildShareCaption(
   return { caption, hashtags };
 }
 
-export function getPlatformShareUrl(platform: SocialPlatform, caption: string): string {
+export function getPlatformShareUrl(
+  platform: SocialPlatform,
+  caption: string,
+  pageUrl?: string
+): string {
   const encoded = encodeURIComponent(caption.slice(0, 200));
+  const page =
+    pageUrl ||
+    (typeof window !== 'undefined' ? window.location.href : '') ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    'https://adautonomy.vercel.app';
   switch (platform) {
     case 'twitter':
       return `https://twitter.com/intent/tweet?text=${encoded}`;
     case 'linkedin':
-      return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : '')}&summary=${encoded}`;
+      return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(page)}&summary=${encoded}`;
+    case 'facebook':
+      return `https://www.facebook.com/sharer/sharer.php?quote=${encoded}`;
     default:
       return PLATFORM_CONFIG[platform].uploadUrl;
   }

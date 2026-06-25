@@ -136,3 +136,32 @@ async function syncCampaignToSupabase(campaign: CampaignState): Promise<void> {
     throw new Error(error.message);
   }
 }
+
+export function readStorageJSON<T>(filename: string, fallback: T): T {
+  return readJSON(filename, fallback);
+}
+
+export function writeStorageJSON<T>(filename: string, data: T): void {
+  writeJSON(filename, data);
+}
+
+export async function syncSocialPostToSupabase(post: {
+  id: string;
+  platform: string;
+  status: string;
+  data: Record<string, unknown>;
+}): Promise<void> {
+  const client = await initSupabase();
+  if (!client) return;
+
+  const { error } = await client.from('social_posts').upsert({
+    id: post.id,
+    platform: post.platform,
+    status: post.status,
+    data: post.data,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
