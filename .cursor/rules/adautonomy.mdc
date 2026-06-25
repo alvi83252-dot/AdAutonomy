@@ -1,0 +1,11 @@
+---
+description: AdAutonomy canonical project specification (offline-first multi-agent ad platform)
+globs:
+alwaysApply: true
+---
+
+The single source of truth for this project is `AGENTS.md` at the repo root.
+Read and follow it before editing. It is shared verbatim by Cursor, Codex, Claude Code,
+and OpenCode — do not create a separate, diverging spec.
+
+@AGENTS.md
