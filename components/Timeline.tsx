@@ -6,11 +6,11 @@ import type { AgentMessage } from '@/lib/types';
 // Semantic message types: a leading status dot carries the color cue, with a
 // full hairline border + faint tint on the row (no side-stripe).
 const typeStyles: Record<string, { surface: string; dot: string }> = {
-  request: { surface: 'border-blue-500/30 bg-blue-500/5', dot: 'bg-blue-500' },
-  response: { surface: 'border-green-500/30 bg-green-500/5', dot: 'bg-green-500' },
-  approval: { surface: 'border-emerald-500/30 bg-emerald-500/5', dot: 'bg-emerald-500' },
-  veto: { surface: 'border-red-500/30 bg-red-500/5', dot: 'bg-red-500' },
-  escalation: { surface: 'border-orange-500/30 bg-orange-500/5', dot: 'bg-orange-500' },
+  request: { surface: 'border-info/30 bg-info/5', dot: 'bg-info' },
+  response: { surface: 'border-success/30 bg-success/5', dot: 'bg-success' },
+  approval: { surface: 'border-primary/30 bg-primary/5', dot: 'bg-primary' },
+  veto: { surface: 'border-destructive/30 bg-destructive/5', dot: 'bg-destructive' },
+  escalation: { surface: 'border-warning/30 bg-warning/5', dot: 'bg-warning' },
   info: { surface: 'border-border bg-muted/30', dot: 'bg-muted-foreground' },
 };
 

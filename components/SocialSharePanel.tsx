@@ -174,7 +174,7 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
           })}
         </div>
 
-        {error && <p className="text-red-400 text-xs">{error}</p>}
+        {error && <p className="text-destructive text-xs">{error}</p>}
 
         <Button
           variant="glow"
@@ -201,8 +201,8 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
               className="space-y-2 pt-2 border-t border-border/50"
             >
               {posts.map((post) => (
-                <div key={post.id} className="flex items-center gap-2 p-2 rounded-lg bg-green-500/10 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-green-400 shrink-0" />
+                <div key={post.id} className="flex items-center gap-2 p-2 rounded-lg bg-success/10 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
                   <div className="flex-1 min-w-0">
                     <span className="font-medium capitalize">{post.platform}</span>
                     <span className="text-muted-foreground ml-2 text-xs capitalize">{post.status}</span>

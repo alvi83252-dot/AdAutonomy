@@ -148,9 +148,9 @@ export function PersonalAssistant() {
               {loading && (
                 <div className="flex justify-start">
                   <div className="bg-muted/50 rounded-2xl px-4 py-2 text-sm text-muted-foreground flex gap-1">
-                    <span className="animate-bounce">·</span>
-                    <span className="animate-bounce" style={{ animationDelay: '0.1s' }}>·</span>
-                    <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>·</span>
+                    <span className="animate-typing-dot">·</span>
+                    <span className="animate-typing-dot" style={{ animationDelay: '0.1s' }}>·</span>
+                    <span className="animate-typing-dot" style={{ animationDelay: '0.2s' }}>·</span>
                   </div>
                 </div>
               )}

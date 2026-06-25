@@ -43,6 +43,9 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card) / <alpha-value>)',
           foreground: 'hsl(var(--card-foreground) / <alpha-value>)',
         },
+        success: 'hsl(var(--success) / <alpha-value>)',
+        warning: 'hsl(var(--warning) / <alpha-value>)',
+        info: 'hsl(var(--info) / <alpha-value>)',
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -52,6 +55,7 @@ const config: Config = {
       animation: {
         shimmer: 'shimmer 2s linear infinite',
         'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+        'typing-dot': 'typing-dot 1.4s ease-in-out infinite',
       },
       keyframes: {
         shimmer: {
@@ -61,6 +65,10 @@ const config: Config = {
         'pulse-glow': {
           '0%, 100%': { opacity: '0.4' },
           '50%': { opacity: '1' },
+        },
+        'typing-dot': {
+          '0%, 80%, 100%': { opacity: '0.3' },
+          '40%': { opacity: '1' },
         },
       },
     },

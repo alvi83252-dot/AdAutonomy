@@ -28,7 +28,7 @@ export class ErrorBoundary extends React.Component<
 
       return (
         <div className="flex flex-col items-center justify-center p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-red-400 mb-4" />
+          <AlertTriangle className="w-12 h-12 text-destructive mb-4" />
           <h2 className="text-lg font-semibold mb-2">Something went wrong</h2>
           <p className="text-sm text-muted-foreground mb-4">{this.state.error?.message}</p>
           <Button variant="outline" onClick={() => this.setState({ hasError: false })}>

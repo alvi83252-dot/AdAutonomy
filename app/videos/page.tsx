@@ -263,7 +263,7 @@ export default function VideosPage() {
             </div>
           </div>
 
-          {error && <p className="text-red-400 text-sm">{error}</p>}
+          {error && <p className="text-destructive text-sm">{error}</p>}
 
           <div className="flex flex-wrap gap-2">
             <Button variant="glow" onClick={handleGenerate} disabled={isGenerating || imageOptimizing} className="flex-1">
@@ -305,7 +305,7 @@ export default function VideosPage() {
                         )}
                       >
                         {isDone ? (
-                          <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />
+                          <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
                         ) : isActive ? (
                           <AgentLoader size="sm" />
                         ) : (
@@ -360,7 +360,7 @@ export default function VideosPage() {
 
           <AnimatedCard delay={0.2} className="overflow-hidden">
             <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <Play className="w-4 h-4 text-green-400" />
+              <Play className="w-4 h-4 text-success" />
               Advertisement Preview
             </h3>
 

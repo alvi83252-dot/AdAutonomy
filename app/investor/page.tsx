@@ -32,7 +32,7 @@ export default function InvestorPage() {
                     <p className="text-xs text-muted-foreground">Total Spend</p>
                   </div>
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <p className="text-2xl font-bold tabular-nums text-green-400">{summary.projectedROI}x</p>
+                    <p className="text-2xl font-bold tabular-nums text-success">{summary.projectedROI}x</p>
                     <p className="text-xs text-muted-foreground">Projected ROI</p>
                   </div>
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
@@ -77,8 +77,8 @@ export default function InvestorPage() {
                 {c.feedback.map((f, i) => (
                   <div key={i} className="p-3 bg-muted/50 rounded-lg mb-2 text-sm">
                     <span className={`text-xs font-medium uppercase ${
-                      f.sentiment === 'positive' ? 'text-green-400' :
-                      f.sentiment === 'negative' ? 'text-red-400' : 'text-yellow-400'
+                      f.sentiment === 'positive' ? 'text-success' :
+                      f.sentiment === 'negative' ? 'text-destructive' : 'text-warning'
                     }`}>{f.sentiment}</span>
                     <p className="mt-1">{f.comment}</p>
                     <p className="text-xs text-muted-foreground mt-1">{f.source}</p>

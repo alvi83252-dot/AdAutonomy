@@ -144,7 +144,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
+        {error && <p className="text-destructive text-sm mb-4">{error}</p>}
 
         <div className="flex gap-3">
           <Button variant="glow" size="lg" onClick={handleLaunch} disabled={loading}>
@@ -183,7 +183,7 @@ export default function HomePage() {
 
       {campaign?.status === 'deployed' && (
         <AnimatedCard delay={0.3} className="text-center">
-          <h3 className="text-2xl font-bold text-green-400 mb-4">Campaign Deployed Successfully</h3>
+          <h3 className="text-2xl font-bold text-success mb-4">Campaign Deployed Successfully</h3>
           <div className="flex flex-wrap justify-center gap-3">
             <Link href="/videos"><Button variant="glow">Create Ad Video</Button></Link>
             <Link href="/creative"><Button variant="outline">View Creatives</Button></Link>

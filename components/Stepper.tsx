@@ -48,7 +48,7 @@ export function Stepper({ steps, currentStep }: StepperProps) {
                   'w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300',
                   isComplete && 'bg-primary border-primary text-primary-foreground',
                   isActive && 'border-primary bg-primary/20 text-primary',
-                  step.status === 'error' && 'border-red-500 bg-red-500/20 text-red-400',
+                  step.status === 'error' && 'border-destructive bg-destructive/20 text-destructive',
                   step.status === 'pending' && 'border-border bg-background text-muted-foreground'
                 )}
               >
