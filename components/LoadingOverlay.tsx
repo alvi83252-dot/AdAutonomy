@@ -60,7 +60,7 @@ export function LoadingOverlay({ visible, message = 'Agents orchestrating your c
           transition={{ duration: 0.3 }}
         >
           <motion.div
-            className="flex flex-col items-center gap-8 p-10 rounded-2xl border border-white/10 bg-card/50 backdrop-blur-xl shadow-2xl max-w-md mx-4"
+            className="flex flex-col items-center gap-8 p-10 rounded-2xl border border-border bg-card/80 backdrop-blur-xl shadow-2xl max-w-md mx-4"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
@@ -68,31 +68,31 @@ export function LoadingOverlay({ visible, message = 'Agents orchestrating your c
           >
             <div className="relative">
               <motion.div
-                className="w-20 h-20 rounded-full border-2 border-indigo-500/30"
+                className="w-20 h-20 rounded-full border-2 border-primary/30"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
               />
               <motion.div
-                className="absolute inset-2 rounded-full border-2 border-t-purple-500 border-r-transparent border-b-transparent border-l-transparent"
+                className="absolute inset-2 rounded-full border-2 border-t-primary border-r-transparent border-b-transparent border-l-transparent"
                 animate={{ rotate: -360 }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
               />
               <div className="absolute inset-0 flex items-center justify-center">
-                <Bot className="w-8 h-8 text-indigo-400" />
+                <Bot className="w-8 h-8 text-primary" />
               </div>
             </div>
 
             <div className="text-center space-y-2">
               <p className="text-lg font-semibold flex items-center justify-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-400" />
+                <Sparkles className="w-4 h-4 text-primary" />
                 {message}
               </p>
               <AgentCycle />
             </div>
 
-            <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+            <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden">
               <motion.div
-                className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"
+                className="h-full bg-primary"
                 initial={{ width: '0%' }}
                 animate={{ width: '100%' }}
                 transition={{ duration: 8, ease: 'easeInOut' }}

@@ -24,7 +24,7 @@ export default function DeployPage() {
           </p>
 
           <AnimatedCard className="text-center py-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 text-green-400 mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-success/15 text-success mb-4">
               <FileText className="w-8 h-8" />
             </div>
             <h2 className="text-2xl font-bold mb-2">

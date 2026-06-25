@@ -144,7 +144,7 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
 
       <div className="rounded-xl border border-border/50 p-4 space-y-4 bg-muted/20">
         <h4 className="font-semibold text-sm flex items-center gap-2">
-          <Share2 className="w-4 h-4 text-indigo-400" />
+          <Share2 className="w-4 h-4 text-primary" />
           Publish to Social Media
         </h4>
 
@@ -159,9 +159,9 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
                 key={platform}
                 onClick={() => togglePlatform(platform)}
                 className={cn(
-                  'flex flex-col items-center gap-1.5 p-3 rounded-lg border text-xs transition-all',
+                  'flex flex-col items-center gap-1.5 p-3 rounded-lg border text-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
                   isSelected
-                    ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-300'
+                    ? 'border-primary/50 bg-primary/10 text-primary'
                     : 'border-border/50 hover:border-border text-muted-foreground hover:text-foreground'
                 )}
               >
@@ -174,7 +174,7 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
           })}
         </div>
 
-        {error && <p className="text-red-400 text-xs">{error}</p>}
+        {error && <p className="text-destructive text-xs">{error}</p>}
 
         <Button
           variant="glow"
@@ -190,7 +190,7 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
         </Button>
 
         <p className="text-xs text-muted-foreground">
-          Simulated publish opens upload pages. Add social API keys in <code className="text-indigo-400">.env.local</code> for live auto-posting.
+          Simulated publish opens upload pages. Add social API keys in <code className="text-primary">.env.local</code> for live auto-posting.
         </p>
 
         <AnimatePresence>
@@ -201,8 +201,8 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
               className="space-y-2 pt-2 border-t border-border/50"
             >
               {posts.map((post) => (
-                <div key={post.id} className="flex items-center gap-2 p-2 rounded-lg bg-green-500/10 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-green-400 shrink-0" />
+                <div key={post.id} className="flex items-center gap-2 p-2 rounded-lg bg-success/10 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-success shrink-0" />
                   <div className="flex-1 min-w-0">
                     <span className="font-medium capitalize">{post.platform}</span>
                     <span className="text-muted-foreground ml-2 text-xs capitalize">{post.status}</span>
@@ -211,7 +211,7 @@ export function SocialSharePanel({ videoBlob, productName, tagline, className }:
                     href={PLATFORM_CONFIG[post.platform].uploadUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-indigo-400 hover:text-indigo-300"
+                    className="text-primary hover:text-primary/80"
                   >
                     <ExternalLink className="w-4 h-4" />
                   </a>

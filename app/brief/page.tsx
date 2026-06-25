@@ -13,7 +13,7 @@ export default function BriefPage() {
         const brief = c.extractedBrief || {};
         return (
           <AnimatedCard>
-            <h2 className="text-lg font-semibold text-indigo-400 mb-4">BriefingAgent Output</h2>
+            <h2 className="text-lg font-semibold text-primary mb-4">BriefingAgent Output</h2>
             <div className="space-y-3">
               <p><strong>Product:</strong> {c.brief.productName}</p>
               <p><strong>Market:</strong> {c.brief.targetMarket}</p>

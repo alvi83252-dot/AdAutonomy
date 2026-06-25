@@ -29,14 +29,14 @@ export function Navbar() {
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl transition-colors duration-500"
+      className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md transition-colors duration-500"
     >
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <Link href="/" className="flex items-center gap-2 font-bold text-xl group">
           <motion.div whileHover={{ rotate: 15, scale: 1.1 }} transition={{ type: 'spring', stiffness: 400 }}>
-            <Zap className="w-6 h-6 text-indigo-400" />
+            <Zap className="w-6 h-6 text-primary" />
           </motion.div>
-          <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+          <span className="text-primary">
             AdAutonomy
           </span>
         </Link>
@@ -45,18 +45,18 @@ export function Navbar() {
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
-              <Link key={item.href} href={item.href} className="relative px-3 py-1.5 text-sm rounded-md">
+              <Link key={item.href} href={item.href} className="relative inline-flex items-center min-h-[44px] px-3 text-sm rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 {isActive && (
                   <motion.div
                     layoutId="nav-active"
-                    className="absolute inset-0 bg-indigo-500/20 rounded-md border border-indigo-500/30"
+                    className="absolute inset-0 bg-primary/15 rounded-md border border-primary/30"
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
                 <span
                   className={cn(
                     'relative z-10 transition-colors duration-200',
-                    isActive ? 'text-indigo-300 font-medium' : 'text-muted-foreground hover:text-foreground'
+                    isActive ? 'text-primary font-medium' : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
                   {item.label}
@@ -69,7 +69,7 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <button
-            className="md:hidden p-2 rounded-md hover:bg-muted/50"
+            className="md:hidden inline-flex items-center justify-center h-11 w-11 rounded-md hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
@@ -93,9 +93,9 @@ export function Navbar() {
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
                   className={cn(
-                    'px-3 py-2 text-sm rounded-md transition-colors',
+                    'flex items-center min-h-[44px] px-3 text-sm rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                     pathname === item.href
-                      ? 'bg-indigo-500/20 text-indigo-300'
+                      ? 'bg-primary/15 text-primary'
                       : 'text-muted-foreground hover:bg-muted/50'
                   )}
                 >

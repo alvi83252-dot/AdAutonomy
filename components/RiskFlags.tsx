@@ -10,10 +10,10 @@ interface RiskFlagsProps {
 }
 
 const severityConfig = {
-  low: { icon: Info, color: 'text-green-400 border-green-500/30 bg-green-500/10' },
-  medium: { icon: AlertTriangle, color: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10' },
-  high: { icon: AlertTriangle, color: 'text-orange-400 border-orange-500/30 bg-orange-500/10' },
-  critical: { icon: XCircle, color: 'text-red-400 border-red-500/30 bg-red-500/10' },
+  low: { icon: Info, color: 'text-success border-success/30 bg-success/10' },
+  medium: { icon: AlertTriangle, color: 'text-warning border-warning/30 bg-warning/10' },
+  high: { icon: AlertTriangle, color: 'text-warning border-warning/60 bg-warning/15' },
+  critical: { icon: XCircle, color: 'text-destructive border-destructive/40 bg-destructive/10' },
 };
 
 export function RiskFlags({ flags }: RiskFlagsProps) {
@@ -22,7 +22,7 @@ export function RiskFlags({ flags }: RiskFlagsProps) {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="flex items-center gap-2 text-green-400 p-4 rounded-lg border border-green-500/30 bg-green-500/10"
+        className="flex items-center gap-2 text-success p-4 rounded-lg border border-success/30 bg-success/10"
       >
         <Shield className="w-5 h-5" />
         <span>All safety checks passed</span>

@@ -44,7 +44,7 @@ export function SplashScreen() {
             <motion.div
               animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
               transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 0.3 }}
-              className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-indigo-500/40"
+              className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center shadow-2xl shadow-primary/40"
             >
               <Zap className="w-10 h-10 text-white" />
             </motion.div>
@@ -53,7 +53,7 @@ export function SplashScreen() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+              className="text-3xl font-bold text-primary"
             >
               AdAutonomy
             </motion.h1>
@@ -67,7 +67,7 @@ export function SplashScreen() {
               {[0, 1, 2].map((i) => (
                 <motion.div
                   key={i}
-                  className="w-2 h-2 rounded-full bg-indigo-400"
+                  className="w-2 h-2 rounded-full bg-primary"
                   animate={{ y: [0, -8, 0] }}
                   transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
                 />

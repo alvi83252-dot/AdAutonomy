@@ -21,17 +21,17 @@ export function CreativePreview({ creatives }: CreativePreviewProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.15 }}
           whileHover={{ y: -8, rotateY: 2 }}
-          className="group relative rounded-xl overflow-hidden border border-white/10 bg-gradient-to-br from-indigo-950/50 to-purple-950/50 p-6 cursor-pointer"
+          className="group relative rounded-xl overflow-hidden border border-border bg-card p-6"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/10 group-hover:to-purple-500/10 transition-all duration-500" />
-          <span className="inline-block px-2 py-0.5 text-xs font-medium bg-indigo-500/30 text-indigo-300 rounded mb-3">
+          <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-all duration-500" />
+          <span className="inline-block px-2 py-0.5 text-xs font-medium bg-primary/20 text-primary rounded mb-3">
             Variant {creative.variant}
           </span>
           <h3 className="text-lg font-bold mb-2 relative">{creative.headline}</h3>
           <p className="text-sm text-muted-foreground mb-4 relative">{creative.body}</p>
-          <button className="relative px-4 py-2 text-sm font-medium bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg text-white">
+          <span className="relative inline-block px-4 py-2 text-sm font-medium bg-primary rounded-lg text-primary-foreground">
             {creative.cta}
-          </button>
+          </span>
           <p className="text-xs text-muted-foreground/60 mt-3 italic">{creative.imagePrompt}</p>
         </motion.div>
       ))}

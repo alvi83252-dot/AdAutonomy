@@ -18,13 +18,13 @@ export default function SimulationPage() {
       {(c) => {
         const sim = c.simulation!;
         const metrics = [
-          { label: 'Impressions', value: sim.impressions.toLocaleString(), color: 'text-indigo-400' },
-          { label: 'Clicks', value: sim.clicks.toLocaleString(), color: 'text-blue-400' },
-          { label: 'Conversions', value: sim.conversions.toLocaleString(), color: 'text-purple-400' },
-          { label: 'CTR', value: `${sim.ctr}%`, color: 'text-pink-400' },
-          { label: 'CPC', value: `$${sim.cpc}`, color: 'text-cyan-400' },
-          { label: 'ROAS', value: `${sim.roas}x`, color: 'text-green-400' },
-          { label: 'Revenue', value: `$${sim.projectedRevenue.toLocaleString()}`, color: 'text-emerald-400' },
+          { label: 'Impressions', value: sim.impressions.toLocaleString(), color: 'text-foreground' },
+          { label: 'Clicks', value: sim.clicks.toLocaleString(), color: 'text-foreground' },
+          { label: 'Conversions', value: sim.conversions.toLocaleString(), color: 'text-foreground' },
+          { label: 'CTR', value: `${sim.ctr}%`, color: 'text-foreground' },
+          { label: 'CPC', value: `$${sim.cpc}`, color: 'text-foreground' },
+          { label: 'ROAS', value: `${sim.roas}x`, color: 'text-primary' },
+          { label: 'Revenue', value: `$${sim.projectedRevenue.toLocaleString()}`, color: 'text-primary' },
         ];
         return (
           <>
@@ -48,7 +48,7 @@ export default function SimulationPage() {
                   transition={{ delay: i * 0.08 }}
                 >
                   <AnimatedCard className="text-center" hover={false}>
-                    <p className={`text-3xl font-bold ${m.color}`}>{m.value}</p>
+                    <p className={`text-3xl font-bold tabular-nums ${m.color}`}>{m.value}</p>
                     <p className="text-sm text-muted-foreground mt-1">{m.label}</p>
                   </AnimatedCard>
                 </motion.div>
