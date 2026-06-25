@@ -10,6 +10,7 @@ import { runFeedbackAgent } from '@/lib/agents/feedbackAgent';
 import { runPaymentAgent } from '@/lib/agents/paymentAgent';
 import { runInvestorAgent } from '@/lib/agents/investorAgent';
 import { runDeploymentAgent } from '@/lib/agents/deploymentAgent';
+import { createCampaignOrchestration } from '@/lib/manus/orchestration';
 import { runDragonflyAgent } from '@/lib/agents/dragonflyAgent';
 import { PIPELINE_STEPS } from '@/lib/pipeline';
 import type { CampaignBrief, CampaignState } from '@/lib/types';
@@ -55,16 +56,30 @@ export async function runPipeline(campaign: CampaignState): Promise<CampaignStat
   let state: CampaignState = { ...campaign, status: 'running' };
   saveCampaign(state);
 
+  const orchestration = await createCampaignOrchestration(state);
+  state = { ...state, orchestration, updatedAt: new Date().toISOString() };
+  saveCampaign(state);
+
   await sendMessage('Orchestrator', 'broadcast', 'info', {
     action: 'pipeline_start',
     campaignId: state.id,
     demoMode: isDemoMode(),
+    orchestrationProvider: orchestration.provider,
+    orchestrationTaskId: orchestration.taskId,
+    executionStrategy: orchestration.executionStrategy,
   });
 
   for (let i = 0; i < STEP_RUNNERS.length; i++) {
     const step = PIPELINE_STEPS[i];
+    const plannedStep = orchestration.steps.find((item) => item.stepId === step.id);
     try {
-      await sendMessage('Orchestrator', step.agent, 'request', { step: step.id, index: i });
+      await sendMessage('Orchestrator', step.agent, 'request', {
+        step: step.id,
+        index: i,
+        objective: plannedStep?.objective,
+        validation: plannedStep?.validation,
+        priority: plannedStep?.priority,
+      });
       state = await STEP_RUNNERS[i](state);
       saveCampaign(state);
 

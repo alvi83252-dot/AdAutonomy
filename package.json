@@ -7,7 +7,9 @@
     "build": "node --use-system-ca ./node_modules/next/dist/bin/next build",
     "start": "node --use-system-ca ./node_modules/next/dist/bin/next start",
     "lint": "next lint",
-    "clean": "node ./scripts/clean-next.mjs"
+    "clean": "node ./scripts/clean-next.mjs",
+    "modal:serve": "modal serve modal/app.py",
+    "modal:deploy": "modal deploy modal/app.py"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.4",

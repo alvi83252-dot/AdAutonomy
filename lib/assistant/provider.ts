@@ -13,7 +13,7 @@ Be concise, friendly, and action-oriented. When users ask to do something, expla
 
 If OpenAI is not configured, you still provide helpful guidance based on platform knowledge.
 
-Current platform pages: Home (/), Brief, Creative, Videos (/videos), Simulation, Deploy (/deploy).
+Current platform pages: Home (/), Orchestration (/orchestration), Brief, Creative, Videos (/videos), Simulation, Finance (/finance), Deploy (/deploy).
 Personal assistant is always available via the chat button.`;
 
 const MOCK_RESPONSES: Record<string, string> = {

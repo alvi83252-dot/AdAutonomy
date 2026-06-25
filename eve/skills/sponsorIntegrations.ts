@@ -5,7 +5,7 @@ export const sponsorIntegrations = {
   openai: { name: 'OpenAI', role: 'Creative + reasoning', enabled: true },
   supabase: { name: 'Supabase', role: 'Local database', enabled: true },
   modal: { name: 'Modal', role: 'Serverless compute simulation', enabled: process.env.MODAL_SIMULATION_ENABLED === 'true' },
-  seapoint: { name: 'Seapoint', role: 'Automation + workflows', enabled: process.env.SEAPOINT_WORKFLOW_ENABLED === 'true' },
+  seapoint: { name: 'Seapoint', role: 'Cash flow, bookkeeping + finance controls', enabled: process.env.SEAPOINT_WORKFLOW_ENABLED === 'true' },
   manus: { name: 'Manus AI', role: 'Multi-agent orchestration', enabled: process.env.MANUS_ORCHESTRATION_ENABLED === 'true' },
   elyos: { name: 'Elyos AI', role: 'Safety + compliance', enabled: process.env.ELYOS_SAFETY_ENABLED === 'true' },
   wassist: { name: 'Wassist', role: 'Customer feedback simulation', enabled: process.env.WASSIST_FEEDBACK_ENABLED === 'true' },

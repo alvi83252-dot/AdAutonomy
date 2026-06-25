@@ -11,6 +11,7 @@ export async function runInvestorAgent(campaign: CampaignState): Promise<Campaig
 product: ${campaign.brief.productName}
 simulation: ${JSON.stringify(campaign.simulation)}
 payments: ${campaign.payments.length} transactions
+Seapoint finance controls: ${JSON.stringify(campaign.finance)}
 Return JSON with totalSpend, projectedROI, breakEvenDays, riskScore (0-1), recommendation, highlights array.`;
 
       const response = await complete(prompt, { task: 'investor' });
@@ -21,12 +22,20 @@ Return JSON with totalSpend, projectedROI, breakEvenDays, riskScore (0-1), recom
       return summary;
     },
     () => ({
-      totalSpend: campaign.simulation ? campaign.simulation.clicks * (campaign.simulation.cpc || 1.5) : 5000,
+      totalSpend:
+        campaign.finance?.campaignSpend ??
+        (campaign.simulation ? campaign.simulation.clicks * (campaign.simulation.cpc || 1.5) : 5000),
       projectedROI: campaign.simulation?.roas ?? 2.5,
-      breakEvenDays: 21,
-      riskScore: 0.3,
+      breakEvenDays: estimateBreakEvenDays(campaign),
+      riskScore: campaign.finance && campaign.finance.runwayMonths < 6 ? 0.55 : 0.3,
       recommendation: 'Proceed with monitored rollout',
-      highlights: ['Positive market signals', 'Diversified channel strategy'],
+      highlights: [
+        'Positive market signals',
+        'Diversified channel strategy',
+        campaign.finance
+          ? `${campaign.finance.runwayMonths} months projected cash runway`
+          : 'Finance controls pending',
+      ],
     }),
     'InvestorAgent'
   );
@@ -34,4 +43,11 @@ Return JSON with totalSpend, projectedROI, breakEvenDays, riskScore (0-1), recom
   updateAgentMemory('InvestorAgent', { confidence, notes: [usedFallback ? 'Fallback investor summary' : 'Investor report ready'] });
 
   return { ...campaign, investorSummary: result, currentStep: 8, updatedAt: new Date().toISOString() };
+}
+
+function estimateBreakEvenDays(campaign: CampaignState): number {
+  const spend = campaign.finance?.campaignSpend ?? 0;
+  const revenue = campaign.finance?.projectedRevenue ?? campaign.simulation?.projectedRevenue ?? 0;
+  if (revenue <= 0 || spend <= 0) return 30;
+  return Math.max(1, Math.round((spend / revenue) * 30));
 }

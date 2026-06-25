@@ -1,5 +1,6 @@
 import { sendMessage } from '@/lib/agents/messaging';
 import { updateAgentMemory } from '@/lib/storage/db';
+import { buildSeapointFinanceSnapshot } from '@/lib/seapoint/finance';
 import type { CampaignState, PaymentRecord } from '@/lib/types';
 import { generateId } from '@/lib/utils';
 
@@ -66,7 +67,7 @@ export async function createCheckout(amount: number, currency = 'USD'): Promise<
   return mockPayment('checkout', amount, currency);
 }
 
-export async function approvePayment(paymentId: string): Promise<PaymentRecord> {
+export async function approvePayment(paymentId: string, fallbackAmount = 100): Promise<PaymentRecord> {
   const token = await getPayPalToken();
 
   if (token && !paymentId.startsWith('mock-')) {
@@ -93,7 +94,11 @@ export async function approvePayment(paymentId: string): Promise<PaymentRecord> 
     }
   }
 
-  return { ...mockPayment('checkout', 100, 'USD'), id: paymentId, status: 'completed' };
+  return {
+    ...mockPayment('checkout', fallbackAmount, 'USD'),
+    id: paymentId,
+    status: 'completed',
+  };
 }
 
 export async function refundPayment(paymentId: string, amount: number): Promise<PaymentRecord> {
@@ -147,7 +152,7 @@ export async function runPaymentAgent(campaign: CampaignState): Promise<Campaign
   const checkout = await createCheckout(adSpend);
   payments.push(checkout);
 
-  const approved = await approvePayment(checkout.id);
+  const approved = await approvePayment(checkout.id, checkout.amount);
   payments.push(approved);
 
   const sub = await simulateSubscription(subscription);
@@ -156,15 +161,31 @@ export async function runPaymentAgent(campaign: CampaignState): Promise<Campaign
   const pay = await simulatePayout(payout);
   payments.push(pay);
 
+  const campaignWithPayments: CampaignState = {
+    ...campaign,
+    payments,
+    currentStep: 7,
+    updatedAt: new Date().toISOString(),
+  };
+  const finance = await buildSeapointFinanceSnapshot(campaignWithPayments);
+
   await sendMessage('PaymentAgent', 'InvestorAgent', 'response', {
     totalPayments: payments.length,
     adSpend,
+    currentCash: finance.currentCash,
+    monthlyBurn: finance.monthlyBurn,
+    runwayMonths: finance.runwayMonths,
+    pendingApprovals: finance.pendingApprovals,
+    seapointSync: finance.sync.status,
   });
 
   updateAgentMemory('PaymentAgent', {
-    confidence: 0.9,
-    notes: [`Processed ${payments.length} transactions`],
+    confidence: finance.sync.status === 'failed' ? 0.75 : 0.9,
+    notes: [
+      `Processed ${payments.length} transactions`,
+      `Seapoint finance controls: ${finance.sync.status}`,
+    ],
   });
 
-  return { ...campaign, payments, currentStep: 7, updatedAt: new Date().toISOString() };
+  return { ...campaignWithPayments, finance };
 }
