@@ -11,6 +11,7 @@ import { runPaymentAgent } from '@/lib/agents/paymentAgent';
 import { runInvestorAgent } from '@/lib/agents/investorAgent';
 import { runDeploymentAgent } from '@/lib/agents/deploymentAgent';
 import { createCampaignOrchestration } from '@/lib/manus/orchestration';
+import { runDragonflyAgent } from '@/lib/agents/dragonflyAgent';
 import { PIPELINE_STEPS } from '@/lib/pipeline';
 import type { CampaignBrief, CampaignState } from '@/lib/types';
 import { generateId, isDemoMode } from '@/lib/utils';
@@ -48,6 +49,7 @@ const STEP_RUNNERS: StepRunner[] = [
   runPaymentAgent,
   runInvestorAgent,
   runDeploymentAgent,
+  runDragonflyAgent,
 ];
 
 export async function runPipeline(campaign: CampaignState): Promise<CampaignState> {

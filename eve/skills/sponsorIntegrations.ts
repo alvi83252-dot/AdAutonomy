@@ -1,3 +1,5 @@
+import type { DragonflyScore } from '@/lib/types';
+
 export const sponsorIntegrations = {
   cursor: { name: 'Cursor', role: 'Autonomous coding engine', enabled: true },
   openai: { name: 'OpenAI', role: 'Creative + reasoning', enabled: true },
@@ -10,8 +12,16 @@ export const sponsorIntegrations = {
   seedcamp: { name: 'Seedcamp', role: 'Investor analysis', enabled: process.env.SEEDCAMP_INVESTOR_ENABLED === 'true' },
   bluewire: { name: 'Blue Wire Capital', role: 'Financial modeling', enabled: process.env.BLUEWIRE_FINANCE_ENABLED === 'true' },
   io: { name: 'IO', role: 'Deployment + ops simulation', enabled: process.env.IO_DEPLOYMENT_ENABLED === 'true' },
-  dragonfly: { name: 'Dragonfly', role: 'Technical excellence scoring', enabled: process.env.DRAGONFLY_SCORING_ENABLED === 'true' },
+  dragonfly: {
+    name: 'Dragonfly',
+    role: 'Technical excellence scoring',
+    enabled: process.env.DRAGONFLY_SCORING_ENABLED === 'true',
+    module: '@/lib/sponsors/dragonflyScoring',
+    website: 'https://dragonfly.xyz',
+  },
   downingStreet: { name: '10 Downing Street', role: 'Ethical AI + compliance', enabled: true },
   codewall: { name: 'CodeWall', role: 'Developer tooling', enabled: true },
   paypal: { name: 'PayPal Sandbox', role: 'Simulated payments', enabled: true },
 };
+
+export type { DragonflyScore };

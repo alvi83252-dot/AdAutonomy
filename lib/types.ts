@@ -17,6 +17,7 @@ export type AgentName =
   | 'PaymentAgent'
   | 'DeploymentAgent'
   | 'VideoAgent'
+  | 'DragonflyAgent'
   | 'Orchestrator';
 
 export type AgentMessage = {
@@ -174,6 +175,25 @@ export type InvestorSummary = {
   highlights: string[];
 };
 
+export type DragonflyBreakdown = {
+  creativeQuality: number;
+  audienceDiversity: number;
+  simulationConsistency: number;
+  safetyCompliance: number;
+  pipelineEfficiency: number;
+  agentConfidence: number;
+  paymentIntegrity: number;
+};
+
+export type DragonflyScore = {
+  overall: number;
+  technicalExcellence: number;
+  autonomy: number;
+  breakdown: DragonflyBreakdown;
+  detail: string;
+  timestamp: string;
+};
+
 export type CampaignState = {
   id: string;
   brief: CampaignBrief;
@@ -187,6 +207,7 @@ export type CampaignState = {
   finance?: SeapointFinanceSnapshot;
   orchestration?: ManusOrchestration;
   investorSummary?: InvestorSummary;
+  autonomyScore?: DragonflyScore;
   approvals: ApprovalVote[];
   status: 'pending' | 'running' | 'review' | 'approved' | 'deployed' | 'failed';
   currentStep: number;
